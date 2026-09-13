@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>EVALUACIÓN CRITERIAL · MULTIMATERIA · V2.1</title>
+    <title>EVALUACIÓN CRITERIAL · MULTIMATERIA · V2.2</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <meta name="theme-color" content="#0b4b6b">
@@ -1639,7 +1639,7 @@
 <body>
 <div id="intro-overlay">
     <div class="intro-title">EVALUACIÓN CRITERIAL<br>MULTIMATERIA</div>
-    <div class="intro-subtitle">by @angelmicelti · v2.1</div>
+    <div class="intro-subtitle">by @angelmicelti · v2.2</div>
 </div>
 
 <div class="container-custom">
@@ -7008,6 +7008,7 @@ const FB_ACTIVITIES_PATH = `${FB_ROOT}/activities`;
 const FB_USERS_PATH = `${FB_ROOT}/users`;
 const FB_COURSES_PATH = `${FB_ROOT}/courses`;
 const FB_SUBJECTS_PATH = `${FB_ROOT}/subjects`;
+const FB_SETTINGS_PATH = `${FB_ROOT}/settings`; // ajustes globales de la app (p. ej. curso actual fijado por el administrador)
 const FB_USERNAME_DOMAIN = 'iesmododios.local'; // dominio interno para emails sintéticos
 // Exponer en window para acceso desde el footer de versión
 window.FB_APP_ID = FB_APP_ID;
@@ -7047,8 +7048,11 @@ let fbAllUsers = [];          // cache en memoria de usuarios
 let fbPendingRenameId = null; // id de actividad a renombrar
 // === Estado de cursos académicos y grupos ===
 let fbAllCourses = [];        // cache en memoria de cursos académicos
-let fbCurrentCourseId = null; // ID del curso activo seleccionado
+let fbCurrentCourseId = null; // ID del curso activo seleccionado (local; por defecto sigue al curso del centro)
 let fbCoursesUnsub = null;    // suscripción onValue para cursos
+// === Curso actual global fijado por el administrador (settings.currentCourseId) ===
+let fbSettingsUnsub = null;        // suscripción onValue a los ajustes globales
+let fbActiveCourseOverrideId = null; // curso fijado globalmente por el admin (o null = automático por fecha)
 // === Estado de materias en la nube ===
 let fbAllSubjects = [];       // cache en memoria de materias guardadas
 let fbSubjectsUnsub = null;   // suscripción onValue para materias
@@ -7268,6 +7272,8 @@ function fb_onAuthStateChanged(user) {
                 fb_subscribeSubjects();
                 // Suscribirse a cursos académicos (admin o usuario normal)
                 fb_subscribeCourses();
+                // Suscribirse a los ajustes globales (curso actual fijado por el admin)
+                fb_subscribeSettings();
                 // Si es admin, suscribirse también a la lista de usuarios
                 if (fbCurrentUser && fbCurrentUser.role === 'admin') {
                     fb_subscribeUsers();
@@ -7285,11 +7291,13 @@ function fb_onAuthStateChanged(user) {
             if (fbSubjectsUnsub) { try { fbSubjectsUnsub(); } catch(e) {} fbSubjectsUnsub = null; }
             if (fbUsersUnsub) { try { fbUsersUnsub(); } catch(e) {} fbUsersUnsub = null; }
             if (fbCoursesUnsub) { try { fbCoursesUnsub(); } catch(e) {} fbCoursesUnsub = null; }
+            if (fbSettingsUnsub) { try { fbSettingsUnsub(); } catch(e) {} fbSettingsUnsub = null; }
             fbAllActivities = [];
             fbAllSubjects = [];
             fbAllUsers = [];
             fbAllCourses = [];
             fbCurrentCourseId = null;
+            fbActiveCourseOverrideId = null;
 
             fb_updateAccountUI();
             fb_updateCloudUI();
@@ -7392,6 +7400,7 @@ function fb_logout() {
     if (fbSubjectsUnsub) { try { fbSubjectsUnsub(); } catch(e) {} fbSubjectsUnsub = null; }
     if (fbUsersUnsub) { try { fbUsersUnsub(); } catch(e) {} fbUsersUnsub = null; }
     if (fbCoursesUnsub) { try { fbCoursesUnsub(); } catch(e) {} fbCoursesUnsub = null; }
+    if (fbSettingsUnsub) { try { fbSettingsUnsub(); } catch(e) {} fbSettingsUnsub = null; }
     // Limpiar estado y UI inmediatamente
     fbCurrentUser = null;
     fbAllActivities = [];
@@ -7399,6 +7408,7 @@ function fb_logout() {
     fbAllUsers = [];
     fbAllCourses = [];
     fbCurrentCourseId = null;
+    fbActiveCourseOverrideId = null;
 
     fb_updateAccountUI();
     fb_updateCloudUI();
@@ -7622,6 +7632,83 @@ function fb_compareCourses(a, b) {
     return aStart - bStart;
 }
 
+// === CURSO ACTUAL DEL CENTRO (global) ===
+// El "curso actual" efectivo se determina así:
+//   1) Si el administrador ha fijado un curso (settings.currentCourseId), ese manda,
+//      aunque no coincida con el curso natural de la fecha.
+//   2) Si no, se usa el curso natural calculado por fecha (1 sep - 31 ago).
+//   3) Si no existe ningún curso con ese label, se usa el más reciente no archivado.
+function fb_getEffectiveCurrentCourseId() {
+    // 1) Curso fijado globalmente por el administrador
+    if (fbActiveCourseOverrideId && fbAllCourses.some(c => c.id === fbActiveCourseOverrideId)) {
+        return fbActiveCourseOverrideId;
+    }
+    // 2) Curso natural según la fecha
+    const currentLabel = fb_getCurrentCourseLabel();
+    const natural = fbAllCourses.find(c => c.label === currentLabel);
+    if (natural) return natural.id;
+    // 3) El más reciente no archivado (o el último si todos están archivados)
+    const lastActive = [...fbAllCourses].reverse().find(c => !c.archived);
+    return lastActive ? lastActive.id : (fbAllCourses.length ? fbAllCourses[fbAllCourses.length - 1].id : null);
+}
+
+// Recalcula la selección local de curso. Si force=false solo actúa cuando no
+// hay selección previa; si force=true, sincroniza siempre (p. ej. cuando el
+// administrador cambia el curso global y debe aplicarse a todos).
+function fb_recomputeCurrentCourse(force) {
+    if (!force && fbCurrentCourseId) return; // ya hay selección local
+    const eff = fb_getEffectiveCurrentCourseId();
+    if (eff) fbCurrentCourseId = eff;
+    // Re-renderizar el modal de grupos si está abierto
+    const groupsModal = document.getElementById('fbGroupsModal');
+    if (groupsModal && groupsModal.classList.contains('show')) {
+        try { fb_renderGroupsModalBody(); } catch (e) {}
+    }
+}
+
+// Suscribirse a los ajustes globales de la app (curso actual fijado por el admin)
+function fb_subscribeSettings() {
+    if (fbSettingsUnsub) fbSettingsUnsub();
+    const ref = fbDb.ref(FB_SETTINGS_PATH);
+    fbSettingsUnsub = ref.on('value', snap => {
+        const val = snap.val() || {};
+        const newOverride = (val.currentCourseId && typeof val.currentCourseId === 'string') ? val.currentCourseId : null;
+        const changed = newOverride !== fbActiveCourseOverrideId;
+        fbActiveCourseOverrideId = newOverride;
+        if (changed) {
+            // El curso global cambió: sincronizar la selección local de todos
+            fb_recomputeCurrentCourse(true);
+        }
+    }, err => console.warn('Error suscripción ajustes:', err));
+}
+
+// (admin) Fijar el curso seleccionado como curso actual del centro, globalmente.
+// Puede fijarse cualquier curso, aunque no coincida con el curso natural de la fecha.
+function fb_adminSetCurrentCourse(courseId) {
+    if (!fbCurrentUser || fbCurrentUser.role !== 'admin') { alert('Solo el administrador puede cambiar el curso actual del centro.'); return; }
+    const course = fbAllCourses.find(c => c.id === courseId);
+    if (!course) { alert('Selecciona primero un curso en el selector.'); return; }
+    const natural = fb_getCurrentCourseLabel();
+    const isNatural = course.label === natural;
+    let msg = `¿Fijar ${course.label} como curso actual del centro?\n\nTodas las personas que usen la app trabajarán por defecto sobre este curso (nuevas actividades, grupos, importaciones).`;
+    if (!isNatural) {
+        msg += `\n\n⚠️ AVISO: ${course.label} NO coincide con el curso natural de la fecha actual (${natural}).\nComo administrador puedes fijarlo igualmente; podrás volver al curso automático en cualquier momento con el botón «Curso automático (fecha)».`;
+    }
+    if (!confirm(msg)) return;
+    fbDb.ref(`${FB_SETTINGS_PATH}/currentCourseId`).set(course.id)
+        .then(() => alert(`✅ El curso actual del centro es ahora ${course.label}.`))
+        .catch(err => alert('Error al fijar el curso: ' + err.message));
+}
+
+// (admin) Restaurar el cálculo automático del curso actual según la fecha
+function fb_adminResetCurrentCourse() {
+    if (!fbCurrentUser || fbCurrentUser.role !== 'admin') { alert('Solo el administrador puede restaurar el curso automático.'); return; }
+    if (!confirm('¿Restaurar el curso automático según la fecha?\n\nEl curso actual del centro volverá a calcularse automáticamente (curso natural: ' + fb_getCurrentCourseLabel() + ').')) return;
+    fbDb.ref(`${FB_SETTINGS_PATH}/currentCourseId`).remove()
+        .then(() => alert('✅ Curso automático restaurado (calculado por fecha: ' + fb_getCurrentCourseLabel() + ').'))
+        .catch(err => alert('Error: ' + err.message));
+}
+
 // Suscribirse a cursos en tiempo real
 function fb_subscribeCourses() {
     if (fbCoursesUnsub) fbCoursesUnsub();
@@ -7637,17 +7724,10 @@ function fb_subscribeCourses() {
             .filter(c => !c.appId || c.appId === FB_APP_ID);
         // Ordenar por label ascendente (más antiguo primero)
         fbAllCourses.sort((a, b) => fb_compareCourses(a.label, b.label));
-        // Si no hay curso activo, seleccionar el curso actual automáticamente
+        // Si no hay curso activo local, seguir al curso efectivo del centro
+        // (fijado por el admin si aplica; si no, curso natural por fecha)
         if (!fbCurrentCourseId) {
-            const currentLabel = fb_getCurrentCourseLabel();
-            const current = fbAllCourses.find(c => c.label === currentLabel);
-            if (current) {
-                fbCurrentCourseId = current.id;
-            } else if (fbAllCourses.length > 0) {
-                // Si no existe el curso actual, usar el más reciente (no archivado preferentemente)
-                const lastActive = [...fbAllCourses].reverse().find(c => !c.archived);
-                fbCurrentCourseId = (lastActive || fbAllCourses[fbAllCourses.length - 1]).id;
-            }
+            fb_recomputeCurrentCourse(false);
         }
 
         // Re-renderizar el modal de grupos si está abierto
@@ -7706,9 +7786,14 @@ function fb_toggleCourseArchived(course) {
         .catch(err => alert('Error: ' + err.message));
 }
 
-// Eliminar un curso (solo si no tiene grupos o si el admin confirma)
+// Eliminar un curso (nunca el curso actual; los demás con confirmación)
 function fb_deleteCourse(course) {
     if (!course || !course.id) return;
+    // El curso actual (el activo en la aplicación) no se puede eliminar
+    if (course.id === fb_getEffectiveCurrentCourseId()) {
+        alert(`⚠️ No se puede eliminar el curso ${course.label} porque es el CURSO ACTUAL del centro.\n\nPara eliminarlo, primero fija otro curso como curso del centro (los administradores disponen del botón «Fijar como curso del centro») o espera a que avance el curso escolar.`);
+        return;
+    }
     const groupCount = course.groups ? Object.keys(course.groups).length : 0;
     if (!confirm(`¿Eliminar el curso ${course.label}?\n${groupCount > 0 ? `Tiene ${groupCount} grupo(s) con alumnos que se perderán.\n` : ''}Esta acción no se puede deshacer.`)) return;
     fbDb.ref(`${FB_COURSES_PATH}/${course.id}`).remove()
@@ -8042,10 +8127,15 @@ function fb_saveCurrentStudentsAsGroup() {
     }).catch(err => alert('Error al guardar alumnos: ' + err.message));
 }
 
-// Importar actividades de un curso anterior al curso actual
-function fb_importActivitiesFromCourse(fromCourseId) {
+// Importar datos de un curso anterior al curso activo:
+//   • Grupos con todo su alumnado (se copian al curso activo; si un grupo ya
+//     existe con el mismo nombre, se renombra indicando el curso de origen)
+//   • Actividades propias del usuario del curso origen (se copian asociadas
+//     al curso activo)
+async function fb_importDataFromCourse(fromCourseId, opts) {
+    opts = opts || {};
     if (!fromCourseId || fromCourseId === fbCurrentCourseId) {
-        alert('Selecciona un curso diferente al actual.');
+        alert('Selecciona un curso origen diferente al curso activo.');
         return;
     }
     const fromCourse = fbAllCourses.find(c => c.id === fromCourseId);
@@ -8053,61 +8143,117 @@ function fb_importActivitiesFromCourse(fromCourseId) {
     if (!fromCourse || !toCourse) return;
     // Verificar que el curso origen es anterior al destino
     if (fb_compareCourses(fromCourse.label, toCourse.label) >= 0) {
-        alert('⚠️ Solo se pueden importar actividades de un curso ANTERIOR al actual.');
+        alert('⚠️ Solo se pueden importar datos de un curso ANTERIOR al curso activo.');
         return;
     }
     if (!fbCurrentUser || !fbCurrentUser.uid) { alert('No hay sesión activa.'); return; }
-    // Buscar actividades del curso origen que pertenezcan al usuario actual
-    // y que tengan el mismo subjectId (misma materia) si la hay cargada
-    const currentSubjectId = fb_getSubjectFingerprint();
-    let userActivities = fbAllActivities.filter(a =>
-        (a.createdBy === fbCurrentUser.uid) &&
-        (a.courseId === fromCourseId)
-    );
-    // Si no hay campo courseId en los registros (heredados), intentar filtrar por createdAt
-    // dentro del rango del curso origen (1 sep yearStart - 31 ago yearEnd)
-    if (userActivities.length === 0) {
-        const start = new Date(fromCourse.yearStart, 8, 1).getTime(); // 1 sep
-        const end = new Date(fromCourse.yearEnd, 7, 31, 23, 59, 59).getTime(); // 31 ago
-        userActivities = fbAllActivities.filter(a => {
-            if (a.createdBy !== (fbCurrentUser && fbCurrentUser.uid)) return false;
-            if (a.courseId) return false; // ya tiene courseId, no se considera heredado
-            const t = a.createdAt || a.updatedAt || 0;
-            return t >= start && t <= end;
-        });
+    const doGroups = !!opts.groups, doActivities = !!opts.activities;
+    if (!doGroups && !doActivities) { alert('Marca al menos una opción: grupos y/o actividades.'); return; }
+
+    // Recopilar los grupos del curso origen
+    const groupEntries = doGroups ? Object.entries(fromCourse.groups || {}) : [];
+    // Recopilar las actividades propias del usuario en el curso origen
+    let userActivities = [];
+    if (doActivities) {
+        userActivities = fbAllActivities.filter(a =>
+            (a.createdBy === fbCurrentUser.uid) &&
+            (a.courseId === fromCourseId)
+        );
+        // Si no hay campo courseId en los registros (heredados), intentar filtrar por
+        // createdAt dentro del rango del curso origen (1 sep yearStart - 31 ago yearEnd)
+        if (userActivities.length === 0) {
+            const start = new Date(fromCourse.yearStart, 8, 1).getTime(); // 1 sep
+            const end = new Date(fromCourse.yearEnd, 7, 31, 23, 59, 59).getTime(); // 31 ago
+            userActivities = fbAllActivities.filter(a => {
+                if (a.createdBy !== (fbCurrentUser && fbCurrentUser.uid)) return false;
+                if (a.courseId) return false; // ya tiene courseId, no se considera heredado
+                const t = a.createdAt || a.updatedAt || 0;
+                return t >= start && t <= end;
+            });
+        }
+        // Filtrar por materia si hay una cargada
+        const currentSubjectId = fb_getSubjectFingerprint();
+        if (currentSubjectId) {
+            const filtered = userActivities.filter(a => (a.subjectId || '') === currentSubjectId);
+            if (filtered.length > 0) userActivities = filtered;
+        }
     }
-    // Filtrar por materia si hay una cargada
-    if (currentSubjectId) {
-        const filtered = userActivities.filter(a => (a.subjectId || '') === currentSubjectId);
-        if (filtered.length > 0) userActivities = filtered;
-    }
-    if (userActivities.length === 0) {
-        alert(`No tienes actividades en el curso ${fromCourse.label} para importar.`);
+    if (groupEntries.length === 0 && userActivities.length === 0) {
+        alert(`No hay datos que importar del curso ${fromCourse.label}.`);
         return;
     }
-    if (!confirm(`¿Importar ${userActivities.length} actividad(es) del curso ${fromCourse.label} al curso ${toCourse.label}?\n\nSe crearán copias de las actividades en el curso actual.`)) return;
-    const promises = userActivities.map(a => {
-        const now = Date.now();
-        // Bug fix: copia profunda del registro para evitar compartir referencias
-        // de objetos anidados (como data) entre el original y la copia.
-        const newRecord = JSON.parse(JSON.stringify(a));
-        delete newRecord.id;
-        newRecord.createdAt = now;
-        newRecord.updatedAt = now;
-        newRecord.courseId = fbCurrentCourseId; // asociar al curso actual
-        // Bug fix: si es un registro de calificaciones (kind=scores), eliminar
-        // configId y configRef porque apuntan a la config original del curso
-        // anterior, que no existe en el nuevo curso. El usuario podrá
-        // re-vincularlas manualmente si lo necesita.
-        if (newRecord.kind === 'scores') {
-            delete newRecord.configId;
-            delete newRecord.configRef;
+    // Resumen previo y confirmación
+    let summary = `¿Importar datos del curso ${fromCourse.label} al curso activo ${toCourse.label}?\n\n`;
+    if (doGroups) summary += `• Grupos: ${groupEntries.length} grupo(s) con todo su alumnado\n`;
+    if (doActivities) summary += `• Actividades: ${userActivities.length} actividad(es) propia(s)\n`;
+    summary += '\nNo se elimina nada: los datos se añaden al curso activo.';
+    if (!confirm(summary)) return;
+
+    try {
+        // 1) Copiar grupos con su alumnado
+        let importedGroups = 0;
+        const renamed = [];
+        if (doGroups && groupEntries.length) {
+            const existingNames = new Set(Object.values(toCourse.groups || {}).map(g => ((g && g.name) || '').trim().toLowerCase()));
+            const updates = {};
+            for (const [, g] of groupEntries) {
+                let name = ((g && g.name) || 'Grupo').trim() || 'Grupo';
+                if (existingNames.has(name.toLowerCase())) {
+                    // Colisión de nombre: renombrar indicando el curso de origen
+                    const alt = `${name} (${fromCourse.label})`;
+                    if (existingNames.has(alt.toLowerCase())) continue; // ya existe incluso con sufijo
+                    renamed.push(name);
+                    name = alt;
+                }
+                const students = Array.isArray(g.students) ? g.students.map(s => ({ fullName: (s && s.fullName) || '' })) : [];
+                const newRef = fbDb.ref(`${FB_COURSES_PATH}/${toCourse.id}/groups`).push();
+                updates[newRef.key] = {
+                    appId: FB_APP_ID,
+                    name: name,
+                    level: (g && g.level) || '',
+                    students: students,
+                    createdAt: Date.now(),
+                    importedFrom: fromCourse.id
+                };
+                existingNames.add(name.toLowerCase());
+                importedGroups++;
+            }
+            if (Object.keys(updates).length) {
+                await fbDb.ref(`${FB_COURSES_PATH}/${toCourse.id}/groups`).update(updates);
+            }
         }
-        return fbDb.ref(FB_ACTIVITIES_PATH).push(newRecord);
-    });
-    Promise.all(promises)
-        .then(() => alert(`✅ ${userActivities.length} actividades importadas al curso ${toCourse.label}.`))
-        .catch(err => alert('Error al importar: ' + err.message));
+        // 2) Copiar actividades propias del usuario
+        let importedActs = 0;
+        if (doActivities && userActivities.length) {
+            const promises = userActivities.map(a => {
+                const now = Date.now();
+                // Copia profunda para evitar compartir referencias de objetos anidados
+                const newRecord = JSON.parse(JSON.stringify(a));
+                delete newRecord.id;
+                newRecord.createdAt = now;
+                newRecord.updatedAt = now;
+                newRecord.courseId = toCourse.id; // asociar al curso activo
+                // Si es un registro de calificaciones (kind=scores), eliminar configId
+                // y configRef porque apuntan a la config original del curso anterior
+                if (newRecord.kind === 'scores') {
+                    delete newRecord.configId;
+                    delete newRecord.configRef;
+                }
+                return fbDb.ref(FB_ACTIVITIES_PATH).push(newRecord);
+            });
+            await Promise.all(promises);
+            importedActs = userActivities.length;
+        }
+        let msg = `✅ Importación completada del curso ${fromCourse.label} al curso ${toCourse.label}.\n\n• ${importedGroups} grupo(s) importado(s)\n• ${importedActs} actividad(es) importada(s)`;
+        if (renamed.length) msg += `\n\nGrupos renombrados por colisión de nombre:\n• ${renamed.join('\n• ')}`;
+        alert(msg);
+        const groupsModal = document.getElementById('fbGroupsModal');
+        if (groupsModal && groupsModal.classList.contains('show')) {
+            fb_renderGroupsModalBody();
+        }
+    } catch (err) {
+        alert('Error al importar: ' + (err && err.message ? err.message : err));
+    }
 }
 
 // === RENDERIZADO DEL MODAL DE GESTIÓN DE CURSOS Y GRUPOS ===
@@ -8118,22 +8264,33 @@ function fb_renderGroupsModalBody() {
         body.innerHTML = '<div class="alert alert-warning mb-0"><i class="bi bi-exclamation-triangle"></i> Debes iniciar sesión para gestionar cursos y grupos.</div>';
         return;
     }
+    // Curso efectivo actual del centro (fijado por admin o por fecha)
+    const effectiveCourseId = fb_getEffectiveCurrentCourseId();
+    const effectiveCourse = fbAllCourses.find(c => c.id === effectiveCourseId);
     // Construir opciones para el selector de curso del modal
-    const courseOptions = fbAllCourses.map(c =>
-        `<option value="${escapeHtml(c.id)}" ${c.id === fbCurrentCourseId ? 'selected' : ''}>${escapeHtml(c.label)}${c.archived ? ' (archivado)' : ''}</option>`
-    ).join('');
+    const courseOptions = fbAllCourses.map(c => {
+        const isCenterCurrent = (c.id === effectiveCourseId);
+        return `<option value="${escapeHtml(c.id)}" ${c.id === fbCurrentCourseId ? 'selected' : ''}>${escapeHtml(c.label)}${c.archived ? ' (archivado)' : ''}${isCenterCurrent ? ' ● actual' : ''}</option>`;
+    }).join('');
+    const isAdminUser = fbCurrentUser && fbCurrentUser.role === 'admin';
+    const isCurrentCourseSel = fbCurrentCourseId && fbCurrentCourseId === effectiveCourseId;
     // Selector de curso del modal (sincronizado con la cabecera)
     let html = `
-        <div class="alert alert-info small mb-3"><i class="bi bi-info-circle-fill"></i> Gestiona los cursos académicos (1 sep - 31 ago) y los grupos de alumnado asociados. Desde aquí puedes guardar la lista de alumnos actual como un grupo reutilizable, o importar alumnos de un grupo guardado a la app activa.</div>
-        <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+        <div class="alert alert-info small mb-3"><i class="bi bi-info-circle-fill"></i> <b>Cursos académicos</b>: cada uno va del 1 de septiembre al 31 de agosto del año siguiente. Puedes crear y eliminar cursos (el curso actual no se puede eliminar). El <b>administrador</b> puede fijar el curso actual del centro para todos los usuarios (aunque no coincida con la fecha) e importar datos del curso anterior al presente.</div>
+        <div class="d-flex flex-wrap gap-2 mb-1 align-items-center">
             <div class="input-group input-group-sm" style="max-width:280px;">
                 <span class="input-group-text"><i class="bi bi-mortarboard"></i> Curso activo</span>
                 <select id="fbGroupsCourseSelect" class="form-select form-select-sm">${courseOptions || '<option value="">Sin cursos</option>'}</select>
             </div>
             <button class="btn btn-outline-success btn-sm" id="fbGroupsCreateCourseBtn"><i class="bi bi-plus-circle"></i> Crear curso</button>
             <button class="btn btn-outline-warning btn-sm" id="fbGroupsToggleArchiveBtn" ${!fbCurrentCourseId ? 'disabled' : ''}><i class="bi bi-archive"></i> Archivar/Desarchivar</button>
-            <button class="btn btn-outline-danger btn-sm" id="fbGroupsDeleteCourseBtn" ${!fbCurrentCourseId ? 'disabled' : ''}><i class="bi bi-trash"></i> Eliminar curso</button>
+            <button class="btn btn-outline-danger btn-sm" id="fbGroupsDeleteCourseBtn" ${!fbCurrentCourseId || isCurrentCourseSel ? 'disabled' : ''} title="${isCurrentCourseSel ? 'El curso actual no se puede eliminar' : 'Eliminar curso'}"><i class="bi bi-trash"></i> Eliminar curso</button>
+            ${isAdminUser ? `
+                <button class="btn btn-outline-primary btn-sm" id="fbGroupsSetCurrentBtn" ${!fbCurrentCourseId ? 'disabled' : ''} title="Fijar el curso seleccionado como curso actual del centro (aplica a todos los usuarios, aunque no coincida con la fecha)"><i class="bi bi-pin-angle"></i> Fijar como curso del centro</button>
+                ${fbActiveCourseOverrideId ? '<button class="btn btn-outline-secondary btn-sm" id="fbGroupsAutoCourseBtn" title="Volver al cálculo automático del curso según la fecha"><i class="bi bi-arrow-clockwise"></i> Curso automático (fecha)</button>' : ''}
+            ` : ''}
         </div>
+        ${effectiveCourse ? `<div class="small text-muted mb-3"><i class="bi bi-pin-map-fill"></i> Curso actual del centro: <strong>${escapeHtml(effectiveCourse.label)}</strong> ${fbActiveCourseOverrideId ? '<span class="badge bg-warning text-dark">fijado por el administrador</span>' : '<span class="badge bg-success">automático (por fecha)</span>'}</div>` : ''}
     `;
     // Curso actual y sus grupos
     const course = fbAllCourses.find(c => c.id === fbCurrentCourseId);
@@ -8141,8 +8298,8 @@ function fb_renderGroupsModalBody() {
         html += `
             <div class="alert alert-secondary mb-3"><i class="bi bi-info-circle"></i> No hay ningún curso seleccionado. Crea uno con el botón "Crear curso".</div>
             <hr>
-            <h6 class="fw-bold"><i class="bi bi-people me-1"></i>Importar actividades desde otro curso</h6>
-            ${fb_renderImportActivitiesBlock()}
+            <h6 class="fw-bold"><i class="bi bi-people me-1"></i>Importar datos desde un curso anterior</h6>
+            ${fb_renderImportDataBlock(null)}
         `;
         body.innerHTML = html;
         // Listeners
@@ -8152,8 +8309,8 @@ function fb_renderGroupsModalBody() {
     html += `
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(145deg, #0b4b6b, #0d6efd); color:white;">
-                <span><i class="bi bi-mortarboard-fill me-1"></i>Curso: <strong>${escapeHtml(course.label)}</strong> ${course.archived ? '<span class="badge bg-warning text-dark ms-1">Archivado</span>' : ''}</span>
-                <span class="small">Años: ${course.yearStart} → ${course.yearEnd}</span>
+                <span><i class="bi bi-mortarboard-fill me-1"></i>Curso: <strong>${escapeHtml(course.label)}</strong> ${course.id === effectiveCourseId ? '<span class="badge bg-success ms-1" title="Es el curso actual del centro (aplica a todos los usuarios)">Curso actual del centro</span>' : ''} ${course.archived ? '<span class="badge bg-warning text-dark ms-1">Archivado</span>' : ''}</span>
+                <span class="small">Del 01/09/${course.yearStart} al 31/08/${course.yearEnd}</span>
             </div>
             <div class="card-body">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
@@ -8172,8 +8329,8 @@ function fb_renderGroupsModalBody() {
             <span class="text-muted small" id="fbGroupsCurrentAppLabel"></span>
         </div>
         <hr>
-        <h6 class="fw-bold"><i class="bi bi-cloud-arrow-down me-1"></i>Importar actividades desde otro curso</h6>
-        ${fb_renderImportActivitiesBlock(course)}
+        <h6 class="fw-bold"><i class="bi bi-cloud-arrow-down me-1"></i>Importar datos desde un curso anterior</h6>
+        ${fb_renderImportDataBlock(course)}
     `;
     body.innerHTML = html;
     // Indicar la app actual
@@ -8240,28 +8397,39 @@ function fb_renderGroupsList(course) {
     return html;
 }
 
-// Construye el bloque HTML para importar actividades desde otro curso
-function fb_renderImportActivitiesBlock(currentCourse) {
+// Construye el bloque HTML para importar datos (grupos y/o actividades)
+// desde un curso anterior al curso activo
+function fb_renderImportDataBlock(currentCourse) {
+    if (!currentCourse) {
+        return '<div class="text-muted small"><i class="bi bi-info-circle"></i> Selecciona o crea un curso activo para poder importar datos de cursos anteriores.</div>';
+    }
     const previousCourses = fbAllCourses.filter(c => {
-        if (!currentCourse) return true;
-        // Cursos anteriores al actual
+        // Cursos anteriores al activo
         return fb_compareCourses(c.label, currentCourse.label) < 0;
-    });
+    }).reverse(); // más recientes primero (el curso anterior inmediato, arriba)
     if (previousCourses.length === 0) {
-        return '<div class="text-muted small"><i class="bi bi-info-circle"></i> No hay cursos anteriores disponibles para importar actividades.</div>';
+        return '<div class="text-muted small"><i class="bi bi-info-circle"></i> No hay cursos anteriores disponibles para importar datos.</div>';
     }
     const options = previousCourses.map(c =>
-        `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}${c.archived ? ' (archivado)' : ''}</option>`
+        `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}${c.archived ? ' (archivado)' : ''}${c.id === fbActiveCourseOverrideId ? ' ← curso del centro' : ''}</option>`
     ).join('');
     return `
-        <div class="d-flex flex-wrap gap-2 align-items-center">
-            <div class="input-group input-group-sm" style="max-width:320px;">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div class="input-group input-group-sm" style="max-width:280px;">
                 <span class="input-group-text"><i class="bi bi-calendar"></i> Curso origen</span>
                 <select id="fbGroupsImportCourseSelect" class="form-select form-select-sm">${options}</select>
             </div>
-            <button class="btn btn-primary btn-sm" id="fbGroupsImportActivitiesBtn"><i class="bi bi-cloud-arrow-down"></i> Importar actividades</button>
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox" id="fbImportDataGroups" checked>
+                <label class="form-check-label small" for="fbImportDataGroups"><i class="bi bi-people-fill"></i> Grupos y alumnado</label>
+            </div>
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox" id="fbImportDataActivities" checked>
+                <label class="form-check-label small" for="fbImportDataActivities"><i class="bi bi-cloud"></i> Mis actividades</label>
+            </div>
+            <button class="btn btn-primary btn-sm" id="fbGroupsImportDataBtn"><i class="bi bi-cloud-arrow-down"></i> Importar datos</button>
         </div>
-        <div class="form-text small mt-1"><i class="bi bi-info-circle"></i> Solo se importan actividades del usuario actual desde un curso anterior al activo. Se crean copias en el curso actual.</div>
+        <div class="form-text small mt-1"><i class="bi bi-info-circle"></i> Los grupos se copian al curso activo con todos sus alumnos (si ya existe un grupo con el mismo nombre, se renombra indicando el curso de origen). Las actividades propias del curso origen se copian asociadas al curso activo.</div>
     `;
 }
 
@@ -8299,12 +8467,23 @@ function fb_attachGroupsModalListeners() {
         const level = prompt('Nivel educativo (opcional, ej: 2º ESO):', '') || '';
         fb_createGroup(name, level);
     });
+    // (admin) Fijar el curso seleccionado como curso actual del centro
+    document.getElementById('fbGroupsSetCurrentBtn')?.addEventListener('click', () => {
+        const course = fbAllCourses.find(c => c.id === fbCurrentCourseId);
+        if (course) fb_adminSetCurrentCourse(course.id);
+    });
+    // (admin) Restaurar el curso automático por fecha
+    document.getElementById('fbGroupsAutoCourseBtn')?.addEventListener('click', fb_adminResetCurrentCourse);
     // Guardar alumnos actuales como grupo
     document.getElementById('fbGroupsSaveStudentsBtn')?.addEventListener('click', fb_saveCurrentStudentsAsGroup);
-    // Importar actividades
-    document.getElementById('fbGroupsImportActivitiesBtn')?.addEventListener('click', () => {
+    // Importar datos (grupos y/o actividades) desde un curso anterior
+    document.getElementById('fbGroupsImportDataBtn')?.addEventListener('click', () => {
         const sel = document.getElementById('fbGroupsImportCourseSelect');
-        if (sel) fb_importActivitiesFromCourse(sel.value);
+        if (!sel) return;
+        fb_importDataFromCourse(sel.value, {
+            groups: document.getElementById('fbImportDataGroups')?.checked,
+            activities: document.getElementById('fbImportDataActivities')?.checked
+        });
     });
     // Delegados: importar alumnos, toggle lista, eliminar grupo, añadir alumno, eliminar alumno
     const body = document.getElementById('fbGroupsModalBody');
@@ -8914,6 +9093,7 @@ function fb_deleteOwnAccount() {
     if (fbSubjectsUnsub) { try { fbSubjectsUnsub(); } catch(e) {} fbSubjectsUnsub = null; }
     if (fbUsersUnsub) { try { fbUsersUnsub(); } catch(e) {} fbUsersUnsub = null; }
     if (fbCoursesUnsub) { try { fbCoursesUnsub(); } catch(e) {} fbCoursesUnsub = null; }
+    if (fbSettingsUnsub) { try { fbSettingsUnsub(); } catch(e) {} fbSettingsUnsub = null; }
     if (typeof autosave_teardownFirebaseSync === 'function') {
         try { autosave_teardownFirebaseSync(); } catch(e) {}
     }
@@ -12009,7 +12189,7 @@ window.onload = function() {
             }
         }
         html += '<span class="me-1">· Espacio: <strong>' + (window.FB_APP_ID || 'multimateria_v2') + '</strong></span>';
-        html += '<span>· by @angelmicelti · Multimateria v2.1</span>';
+        html += '<span>· by @angelmicelti · Multimateria v2.2</span>';
         footer.innerHTML = html;
     }
     // Leer la versión desde sw.js. Funciona en http/https (GitHub Pages).
