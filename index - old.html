@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>EVALUACIÓN CRITERIAL · MULTIMATERIA · V2.2</title>
+    <title>EVALUACIÓN CRITERIAL · MULTIMATERIA · V2.0</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <meta name="theme-color" content="#0b4b6b">
@@ -1639,7 +1639,7 @@
 <body>
 <div id="intro-overlay">
     <div class="intro-title">EVALUACIÓN CRITERIAL<br>MULTIMATERIA</div>
-    <div class="intro-subtitle">by @angelmicelti · v2.2</div>
+    <div class="intro-subtitle">by @angelmicelti · v2.0</div>
 </div>
 
 <div class="container-custom">
@@ -1745,8 +1745,7 @@
                     <div id="fbCloudNotLoggedIn" class="text-center py-4">
                         <i class="bi bi-lock-fill" style="font-size:3rem; color:#ffc107;"></i>
                         <h5 class="mt-2 mb-2">Inicia sesión para acceder</h5>
-                        <p class="text-muted mb-1">Para guardar y recuperar actividades en la nube necesitas una cuenta de usuario.</p>
-                        <p class="small text-muted mb-3"><i class="bi bi-shield-fill-check"></i> Accede con tu <b>usuario IdEA</b>. La contraseña inicial es tu propio usuario IdEA (podrás cambiarla al entrar).</p>
+                        <p class="text-muted mb-3">Para guardar y recuperar actividades en la nube necesitas una cuenta de usuario.</p>
                         <button class="btn btn-warning btn-lg" id="fbCloudLoginBtn"><i class="bi bi-box-arrow-in-right"></i> Iniciar sesión</button>
                     </div>
                     <div id="fbCloudContent" style="display:none;">
@@ -2539,8 +2538,7 @@
                             <!-- Login -->
                             <div class="tab-pane fade show active" id="fbAuthLoginPane" role="tabpanel">
                                 <div class="fb-auth-form">
-                                    <div class="alert alert-warning small py-2 px-3 mb-2"><i class="bi bi-shield-fill-check"></i> <b>Debes iniciar sesión con tu usuario IdEA</b> (el mismo que usas en las aplicaciones de la Junta de Andalucía, p. ej. <b>mbaeesp634</b>).<br><i class="bi bi-key"></i> La contraseña inicial coincide con tu usuario IdEA; podrás cambiarla después de iniciar sesión desde tu panel de cuenta.</div>
-                                    <input type="text" class="form-control" id="fbLoginEmail" placeholder="Usuario IdEA (p. ej. mbaeesp634)" autocomplete="username">
+                                    <input type="text" class="form-control" id="fbLoginEmail" placeholder="Nombre de usuario" autocomplete="username">
                                     <input type="password" class="form-control" id="fbLoginPassword" placeholder="Contraseña" autocomplete="current-password">
                                     <button class="btn btn-warning btn-lg w-100" id="fbLoginBtn"><i class="bi bi-box-arrow-in-right"></i> Entrar</button>
                                 </div>
@@ -2575,7 +2573,6 @@
                         <div class="alert alert-info small py-1 px-2 mb-2"><i class="bi bi-shield-lock"></i> Tus datos y actividades están aislados en un espacio propio de esta app y no se mezclan con los de otras aplicaciones del proyecto.</div>
                         <div class="d-flex flex-column gap-2">
                             <button class="btn btn-outline-primary" id="fbAccountManageUsersBtn"><i class="bi bi-people-fill"></i> Gestionar usuarios <span class="badge bg-danger d-none" id="fbAccountUsersBadge"></span></button>
-                            <button class="btn btn-outline-primary" id="fbAccountChangePasswordBtn"><i class="bi bi-key"></i> Cambiar contraseña</button>
                             <button class="btn btn-outline-secondary" id="fbAccountChangeNameBtn"><i class="bi bi-pencil"></i> Cambiar nombre para mostrar</button>
                             <button class="btn btn-outline-danger" id="fbAccountLogoutBtn"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
                             <button class="btn btn-outline-danger btn-sm" id="fbAccountDeleteBtn"><i class="bi bi-trash3"></i> Eliminar mi cuenta definitivamente</button>
@@ -2606,7 +2603,7 @@
                     <div class="tab-content">
                         <!-- TAB 1: Gestión de usuarios -->
                         <div class="tab-pane fade show active" id="fbAdminUsersPane" role="tabpanel">
-                            <div class="alert alert-warning small mb-3"><i class="bi bi-shield-fill-exclamation"></i> Como administrador puedes añadir, <b>importar desde Excel</b>, editar y eliminar usuarios, cambiar su perfil (Administrador/Profesor) y restablecer sus contraseñas. Los usuarios importados acceden con su <b>usuario IdEA</b> como usuario y contraseña inicial, y podrán cambiarla desde su panel de cuenta. <b>No puedes eliminarte a ti mismo ni quitarte el rol de administrador</b>.</div>
+                            <div class="alert alert-warning small mb-3"><i class="bi bi-shield-fill-exclamation"></i> Como administrador puedes añadir, editar y eliminar usuarios, cambiar su perfil (Administrador/Profesor) y restablecer sus contraseñas. <b>No puedes eliminarte a ti mismo ni quitarte el rol de administrador</b>.</div>
                             <div class="d-flex flex-wrap gap-2 mb-3">
                                 <span class="badge bg-secondary fs-6">Total: <span id="fbUsersCount">0</span></span>
                                 <span class="badge bg-danger fs-6">Admins: <span id="fbUsersAdminCount">0</span></span>
@@ -2636,86 +2633,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-outline-success me-auto" id="fbUsersImportBtn" title="Importar múltiples usuarios desde el fichero Excel del personal del centro"><i class="bi bi-file-earmark-arrow-up"></i> Importar usuarios (Excel)</button>
-                    <button class="btn btn-success" id="fbUsersAddBtn"><i class="bi bi-person-plus"></i> Añadir nuevo usuario</button>
+                    <button class="btn btn-success me-auto" id="fbUsersAddBtn"><i class="bi bi-person-plus"></i> Añadir nuevo usuario</button>
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL IMPORTAR USUARIOS DESDE EXCEL (solo admin) -->
-    <div class="modal fade" id="fbImportUsersModal" tabindex="-1" aria-labelledby="fbImportUsersModalLabel" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(145deg, #198754, #0f6b3f);">
-                    <h5 class="modal-title text-white" id="fbImportUsersModalLabel"><i class="bi bi-file-earmark-arrow-up me-2"></i>Importar usuarios desde Excel</h5>
-                    <button class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Paso 1: selección de fichero -->
-                    <div id="fbImportStep1">
-                        <div class="alert alert-info small mb-3"><i class="bi bi-info-circle-fill"></i> Selecciona el fichero Excel (<b>.xls, .xlsx o .csv</b>) con el personal del centro. Se admiten dos formatos:
-                            <ul class="mb-0 mt-1">
-                                <li><b>RelPerCen (Séneca)</b>: hoja «PERSONAL DEL CENTRO» con la columna <b>Usuario IdEA</b>. Cada usuario se crea con su usuario IdEA y como contraseña inicial su propio usuario IdEA.</li>
-                                <li><b>Listado simplificado</b>: columnas <b>Nombre · Usuario · Contraseña · Rol · Tutoría</b>. Si la columna Contraseña está vacía, se usa el usuario como contraseña.</li>
-                            </ul>
-                        </div>
-                        <div class="alert alert-secondary small py-2 px-3 mb-3"><i class="bi bi-shield-lock"></i> Si un usuario ya existe, se omite (no se toca su contraseña). Con la app abierta podrás verlos en la lista y cada usuario podrá cambiar su contraseña desde su panel de cuenta.</div>
-                        <label for="fbImportFileInput" class="btn btn-success btn-lg w-100"><i class="fas fa-file-import"></i> Seleccionar fichero Excel</label>
-                        <input type="file" id="fbImportFileInput" accept=".xls,.xlsx,.csv" class="hidden">
-                        <div id="fbImportParseMsg" class="small mt-2"></div>
-                    </div>
-                    <!-- Paso 2: previsualización -->
-                    <div id="fbImportStep2" style="display:none;">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span class="fw-semibold"><i class="bi bi-eye"></i> Usuarios detectados: <span id="fbImportCount">0</span> <span class="badge bg-secondary ms-1" id="fbImportFormatBadge"></span></span>
-                            <button class="btn btn-sm btn-outline-secondary" id="fbImportResetBtn" type="button"><i class="bi bi-arrow-left"></i> Elegir otro fichero</button>
-                        </div>
-                        <div id="fbImportPreviewWrap" style="max-height:280px; overflow:auto; border:1px solid #dee2e6; border-radius:.375rem;">
-                            <table class="table table-sm table-hover mb-0">
-                                <thead class="table-light"><tr><th>#</th><th>Nombre</th><th>Usuario IdEA</th><th>Rol</th><th>Tutoría</th><th>Estado</th></tr></thead>
-                                <tbody id="fbImportPreviewBody"></tbody>
-                            </table>
-                        </div>
-                        <div id="fbImportParseErrors" class="small mt-2"></div>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="checkbox" id="fbImportOverwriteRole">
-                            <label class="form-check-label small" for="fbImportOverwriteRole">Si un usuario ya existe en la aplicación, actualizar su rol y tutoría según el fichero (no afecta a su contraseña)</label>
-                        </div>
-                    </div>
-                    <!-- Progreso y resultados -->
-                    <div id="fbImportProgress" style="display:none;" class="mt-3">
-                        <div class="progress" style="height:20px;"><div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="fbImportProgressBar" style="width:0%;">0%</div></div>
-                        <div id="fbImportResults" class="mt-2 small" style="max-height:220px; overflow:auto;"></div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button class="btn btn-success" id="fbImportExecuteBtn" disabled style="display:none;"><i class="bi bi-people-fill"></i> Importar usuarios</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL CAMBIAR CONTRASEÑA (usuario autenticado) -->
-    <div class="modal fade" id="fbChangePasswordModal" tabindex="-1" aria-labelledby="fbChangePasswordModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(145deg, #0d6efd, #0b5ed7);">
-                    <h5 class="modal-title text-white" id="fbChangePasswordModalLabel"><i class="bi bi-key me-2"></i>Cambiar mi contraseña</h5>
-                    <button class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-info small py-2 px-3"><i class="bi bi-info-circle"></i> Tu contraseña inicial era tu <b>usuario IdEA</b>. Si la cambias aquí, la nueva contraseña será la que uses en el próximo inicio de sesión.</div>
-                    <input type="password" class="form-control mb-2" id="fbChangePwCurrent" placeholder="Contraseña actual" autocomplete="current-password">
-                    <input type="password" class="form-control mb-2" id="fbChangePwNew" placeholder="Contraseña nueva (mínimo 6 caracteres)" autocomplete="new-password">
-                    <input type="password" class="form-control" id="fbChangePwConfirm" placeholder="Repite la contraseña nueva" autocomplete="new-password">
-                    <div id="fbChangePwMessage" class="small mt-2"></div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-primary" id="fbChangePwConfirmBtn"><i class="bi bi-check2-circle"></i> Guardar contraseña</button>
                 </div>
             </div>
         </div>
@@ -7008,7 +6927,6 @@ const FB_ACTIVITIES_PATH = `${FB_ROOT}/activities`;
 const FB_USERS_PATH = `${FB_ROOT}/users`;
 const FB_COURSES_PATH = `${FB_ROOT}/courses`;
 const FB_SUBJECTS_PATH = `${FB_ROOT}/subjects`;
-const FB_SETTINGS_PATH = `${FB_ROOT}/settings`; // ajustes globales de la app (p. ej. curso actual fijado por el administrador)
 const FB_USERNAME_DOMAIN = 'iesmododios.local'; // dominio interno para emails sintéticos
 // Exponer en window para acceso desde el footer de versión
 window.FB_APP_ID = FB_APP_ID;
@@ -7048,11 +6966,8 @@ let fbAllUsers = [];          // cache en memoria de usuarios
 let fbPendingRenameId = null; // id de actividad a renombrar
 // === Estado de cursos académicos y grupos ===
 let fbAllCourses = [];        // cache en memoria de cursos académicos
-let fbCurrentCourseId = null; // ID del curso activo seleccionado (local; por defecto sigue al curso del centro)
+let fbCurrentCourseId = null; // ID del curso activo seleccionado
 let fbCoursesUnsub = null;    // suscripción onValue para cursos
-// === Curso actual global fijado por el administrador (settings.currentCourseId) ===
-let fbSettingsUnsub = null;        // suscripción onValue a los ajustes globales
-let fbActiveCourseOverrideId = null; // curso fijado globalmente por el admin (o null = automático por fecha)
 // === Estado de materias en la nube ===
 let fbAllSubjects = [];       // cache en memoria de materias guardadas
 let fbSubjectsUnsub = null;   // suscripción onValue para materias
@@ -7272,8 +7187,6 @@ function fb_onAuthStateChanged(user) {
                 fb_subscribeSubjects();
                 // Suscribirse a cursos académicos (admin o usuario normal)
                 fb_subscribeCourses();
-                // Suscribirse a los ajustes globales (curso actual fijado por el admin)
-                fb_subscribeSettings();
                 // Si es admin, suscribirse también a la lista de usuarios
                 if (fbCurrentUser && fbCurrentUser.role === 'admin') {
                     fb_subscribeUsers();
@@ -7291,13 +7204,11 @@ function fb_onAuthStateChanged(user) {
             if (fbSubjectsUnsub) { try { fbSubjectsUnsub(); } catch(e) {} fbSubjectsUnsub = null; }
             if (fbUsersUnsub) { try { fbUsersUnsub(); } catch(e) {} fbUsersUnsub = null; }
             if (fbCoursesUnsub) { try { fbCoursesUnsub(); } catch(e) {} fbCoursesUnsub = null; }
-            if (fbSettingsUnsub) { try { fbSettingsUnsub(); } catch(e) {} fbSettingsUnsub = null; }
             fbAllActivities = [];
             fbAllSubjects = [];
             fbAllUsers = [];
             fbAllCourses = [];
             fbCurrentCourseId = null;
-            fbActiveCourseOverrideId = null;
 
             fb_updateAccountUI();
             fb_updateCloudUI();
@@ -7400,7 +7311,6 @@ function fb_logout() {
     if (fbSubjectsUnsub) { try { fbSubjectsUnsub(); } catch(e) {} fbSubjectsUnsub = null; }
     if (fbUsersUnsub) { try { fbUsersUnsub(); } catch(e) {} fbUsersUnsub = null; }
     if (fbCoursesUnsub) { try { fbCoursesUnsub(); } catch(e) {} fbCoursesUnsub = null; }
-    if (fbSettingsUnsub) { try { fbSettingsUnsub(); } catch(e) {} fbSettingsUnsub = null; }
     // Limpiar estado y UI inmediatamente
     fbCurrentUser = null;
     fbAllActivities = [];
@@ -7408,7 +7318,6 @@ function fb_logout() {
     fbAllUsers = [];
     fbAllCourses = [];
     fbCurrentCourseId = null;
-    fbActiveCourseOverrideId = null;
 
     fb_updateAccountUI();
     fb_updateCloudUI();
@@ -7632,83 +7541,6 @@ function fb_compareCourses(a, b) {
     return aStart - bStart;
 }
 
-// === CURSO ACTUAL DEL CENTRO (global) ===
-// El "curso actual" efectivo se determina así:
-//   1) Si el administrador ha fijado un curso (settings.currentCourseId), ese manda,
-//      aunque no coincida con el curso natural de la fecha.
-//   2) Si no, se usa el curso natural calculado por fecha (1 sep - 31 ago).
-//   3) Si no existe ningún curso con ese label, se usa el más reciente no archivado.
-function fb_getEffectiveCurrentCourseId() {
-    // 1) Curso fijado globalmente por el administrador
-    if (fbActiveCourseOverrideId && fbAllCourses.some(c => c.id === fbActiveCourseOverrideId)) {
-        return fbActiveCourseOverrideId;
-    }
-    // 2) Curso natural según la fecha
-    const currentLabel = fb_getCurrentCourseLabel();
-    const natural = fbAllCourses.find(c => c.label === currentLabel);
-    if (natural) return natural.id;
-    // 3) El más reciente no archivado (o el último si todos están archivados)
-    const lastActive = [...fbAllCourses].reverse().find(c => !c.archived);
-    return lastActive ? lastActive.id : (fbAllCourses.length ? fbAllCourses[fbAllCourses.length - 1].id : null);
-}
-
-// Recalcula la selección local de curso. Si force=false solo actúa cuando no
-// hay selección previa; si force=true, sincroniza siempre (p. ej. cuando el
-// administrador cambia el curso global y debe aplicarse a todos).
-function fb_recomputeCurrentCourse(force) {
-    if (!force && fbCurrentCourseId) return; // ya hay selección local
-    const eff = fb_getEffectiveCurrentCourseId();
-    if (eff) fbCurrentCourseId = eff;
-    // Re-renderizar el modal de grupos si está abierto
-    const groupsModal = document.getElementById('fbGroupsModal');
-    if (groupsModal && groupsModal.classList.contains('show')) {
-        try { fb_renderGroupsModalBody(); } catch (e) {}
-    }
-}
-
-// Suscribirse a los ajustes globales de la app (curso actual fijado por el admin)
-function fb_subscribeSettings() {
-    if (fbSettingsUnsub) fbSettingsUnsub();
-    const ref = fbDb.ref(FB_SETTINGS_PATH);
-    fbSettingsUnsub = ref.on('value', snap => {
-        const val = snap.val() || {};
-        const newOverride = (val.currentCourseId && typeof val.currentCourseId === 'string') ? val.currentCourseId : null;
-        const changed = newOverride !== fbActiveCourseOverrideId;
-        fbActiveCourseOverrideId = newOverride;
-        if (changed) {
-            // El curso global cambió: sincronizar la selección local de todos
-            fb_recomputeCurrentCourse(true);
-        }
-    }, err => console.warn('Error suscripción ajustes:', err));
-}
-
-// (admin) Fijar el curso seleccionado como curso actual del centro, globalmente.
-// Puede fijarse cualquier curso, aunque no coincida con el curso natural de la fecha.
-function fb_adminSetCurrentCourse(courseId) {
-    if (!fbCurrentUser || fbCurrentUser.role !== 'admin') { alert('Solo el administrador puede cambiar el curso actual del centro.'); return; }
-    const course = fbAllCourses.find(c => c.id === courseId);
-    if (!course) { alert('Selecciona primero un curso en el selector.'); return; }
-    const natural = fb_getCurrentCourseLabel();
-    const isNatural = course.label === natural;
-    let msg = `¿Fijar ${course.label} como curso actual del centro?\n\nTodas las personas que usen la app trabajarán por defecto sobre este curso (nuevas actividades, grupos, importaciones).`;
-    if (!isNatural) {
-        msg += `\n\n⚠️ AVISO: ${course.label} NO coincide con el curso natural de la fecha actual (${natural}).\nComo administrador puedes fijarlo igualmente; podrás volver al curso automático en cualquier momento con el botón «Curso automático (fecha)».`;
-    }
-    if (!confirm(msg)) return;
-    fbDb.ref(`${FB_SETTINGS_PATH}/currentCourseId`).set(course.id)
-        .then(() => alert(`✅ El curso actual del centro es ahora ${course.label}.`))
-        .catch(err => alert('Error al fijar el curso: ' + err.message));
-}
-
-// (admin) Restaurar el cálculo automático del curso actual según la fecha
-function fb_adminResetCurrentCourse() {
-    if (!fbCurrentUser || fbCurrentUser.role !== 'admin') { alert('Solo el administrador puede restaurar el curso automático.'); return; }
-    if (!confirm('¿Restaurar el curso automático según la fecha?\n\nEl curso actual del centro volverá a calcularse automáticamente (curso natural: ' + fb_getCurrentCourseLabel() + ').')) return;
-    fbDb.ref(`${FB_SETTINGS_PATH}/currentCourseId`).remove()
-        .then(() => alert('✅ Curso automático restaurado (calculado por fecha: ' + fb_getCurrentCourseLabel() + ').'))
-        .catch(err => alert('Error: ' + err.message));
-}
-
 // Suscribirse a cursos en tiempo real
 function fb_subscribeCourses() {
     if (fbCoursesUnsub) fbCoursesUnsub();
@@ -7724,10 +7556,17 @@ function fb_subscribeCourses() {
             .filter(c => !c.appId || c.appId === FB_APP_ID);
         // Ordenar por label ascendente (más antiguo primero)
         fbAllCourses.sort((a, b) => fb_compareCourses(a.label, b.label));
-        // Si no hay curso activo local, seguir al curso efectivo del centro
-        // (fijado por el admin si aplica; si no, curso natural por fecha)
+        // Si no hay curso activo, seleccionar el curso actual automáticamente
         if (!fbCurrentCourseId) {
-            fb_recomputeCurrentCourse(false);
+            const currentLabel = fb_getCurrentCourseLabel();
+            const current = fbAllCourses.find(c => c.label === currentLabel);
+            if (current) {
+                fbCurrentCourseId = current.id;
+            } else if (fbAllCourses.length > 0) {
+                // Si no existe el curso actual, usar el más reciente (no archivado preferentemente)
+                const lastActive = [...fbAllCourses].reverse().find(c => !c.archived);
+                fbCurrentCourseId = (lastActive || fbAllCourses[fbAllCourses.length - 1]).id;
+            }
         }
 
         // Re-renderizar el modal de grupos si está abierto
@@ -7786,14 +7625,9 @@ function fb_toggleCourseArchived(course) {
         .catch(err => alert('Error: ' + err.message));
 }
 
-// Eliminar un curso (nunca el curso actual; los demás con confirmación)
+// Eliminar un curso (solo si no tiene grupos o si el admin confirma)
 function fb_deleteCourse(course) {
     if (!course || !course.id) return;
-    // El curso actual (el activo en la aplicación) no se puede eliminar
-    if (course.id === fb_getEffectiveCurrentCourseId()) {
-        alert(`⚠️ No se puede eliminar el curso ${course.label} porque es el CURSO ACTUAL del centro.\n\nPara eliminarlo, primero fija otro curso como curso del centro (los administradores disponen del botón «Fijar como curso del centro») o espera a que avance el curso escolar.`);
-        return;
-    }
     const groupCount = course.groups ? Object.keys(course.groups).length : 0;
     if (!confirm(`¿Eliminar el curso ${course.label}?\n${groupCount > 0 ? `Tiene ${groupCount} grupo(s) con alumnos que se perderán.\n` : ''}Esta acción no se puede deshacer.`)) return;
     fbDb.ref(`${FB_COURSES_PATH}/${course.id}`).remove()
@@ -8127,15 +7961,10 @@ function fb_saveCurrentStudentsAsGroup() {
     }).catch(err => alert('Error al guardar alumnos: ' + err.message));
 }
 
-// Importar datos de un curso anterior al curso activo:
-//   • Grupos con todo su alumnado (se copian al curso activo; si un grupo ya
-//     existe con el mismo nombre, se renombra indicando el curso de origen)
-//   • Actividades propias del usuario del curso origen (se copian asociadas
-//     al curso activo)
-async function fb_importDataFromCourse(fromCourseId, opts) {
-    opts = opts || {};
+// Importar actividades de un curso anterior al curso actual
+function fb_importActivitiesFromCourse(fromCourseId) {
     if (!fromCourseId || fromCourseId === fbCurrentCourseId) {
-        alert('Selecciona un curso origen diferente al curso activo.');
+        alert('Selecciona un curso diferente al actual.');
         return;
     }
     const fromCourse = fbAllCourses.find(c => c.id === fromCourseId);
@@ -8143,117 +7972,61 @@ async function fb_importDataFromCourse(fromCourseId, opts) {
     if (!fromCourse || !toCourse) return;
     // Verificar que el curso origen es anterior al destino
     if (fb_compareCourses(fromCourse.label, toCourse.label) >= 0) {
-        alert('⚠️ Solo se pueden importar datos de un curso ANTERIOR al curso activo.');
+        alert('⚠️ Solo se pueden importar actividades de un curso ANTERIOR al actual.');
         return;
     }
     if (!fbCurrentUser || !fbCurrentUser.uid) { alert('No hay sesión activa.'); return; }
-    const doGroups = !!opts.groups, doActivities = !!opts.activities;
-    if (!doGroups && !doActivities) { alert('Marca al menos una opción: grupos y/o actividades.'); return; }
-
-    // Recopilar los grupos del curso origen
-    const groupEntries = doGroups ? Object.entries(fromCourse.groups || {}) : [];
-    // Recopilar las actividades propias del usuario en el curso origen
-    let userActivities = [];
-    if (doActivities) {
-        userActivities = fbAllActivities.filter(a =>
-            (a.createdBy === fbCurrentUser.uid) &&
-            (a.courseId === fromCourseId)
-        );
-        // Si no hay campo courseId en los registros (heredados), intentar filtrar por
-        // createdAt dentro del rango del curso origen (1 sep yearStart - 31 ago yearEnd)
-        if (userActivities.length === 0) {
-            const start = new Date(fromCourse.yearStart, 8, 1).getTime(); // 1 sep
-            const end = new Date(fromCourse.yearEnd, 7, 31, 23, 59, 59).getTime(); // 31 ago
-            userActivities = fbAllActivities.filter(a => {
-                if (a.createdBy !== (fbCurrentUser && fbCurrentUser.uid)) return false;
-                if (a.courseId) return false; // ya tiene courseId, no se considera heredado
-                const t = a.createdAt || a.updatedAt || 0;
-                return t >= start && t <= end;
-            });
-        }
-        // Filtrar por materia si hay una cargada
-        const currentSubjectId = fb_getSubjectFingerprint();
-        if (currentSubjectId) {
-            const filtered = userActivities.filter(a => (a.subjectId || '') === currentSubjectId);
-            if (filtered.length > 0) userActivities = filtered;
-        }
+    // Buscar actividades del curso origen que pertenezcan al usuario actual
+    // y que tengan el mismo subjectId (misma materia) si la hay cargada
+    const currentSubjectId = fb_getSubjectFingerprint();
+    let userActivities = fbAllActivities.filter(a =>
+        (a.createdBy === fbCurrentUser.uid) &&
+        (a.courseId === fromCourseId)
+    );
+    // Si no hay campo courseId en los registros (heredados), intentar filtrar por createdAt
+    // dentro del rango del curso origen (1 sep yearStart - 31 ago yearEnd)
+    if (userActivities.length === 0) {
+        const start = new Date(fromCourse.yearStart, 8, 1).getTime(); // 1 sep
+        const end = new Date(fromCourse.yearEnd, 7, 31, 23, 59, 59).getTime(); // 31 ago
+        userActivities = fbAllActivities.filter(a => {
+            if (a.createdBy !== (fbCurrentUser && fbCurrentUser.uid)) return false;
+            if (a.courseId) return false; // ya tiene courseId, no se considera heredado
+            const t = a.createdAt || a.updatedAt || 0;
+            return t >= start && t <= end;
+        });
     }
-    if (groupEntries.length === 0 && userActivities.length === 0) {
-        alert(`No hay datos que importar del curso ${fromCourse.label}.`);
+    // Filtrar por materia si hay una cargada
+    if (currentSubjectId) {
+        const filtered = userActivities.filter(a => (a.subjectId || '') === currentSubjectId);
+        if (filtered.length > 0) userActivities = filtered;
+    }
+    if (userActivities.length === 0) {
+        alert(`No tienes actividades en el curso ${fromCourse.label} para importar.`);
         return;
     }
-    // Resumen previo y confirmación
-    let summary = `¿Importar datos del curso ${fromCourse.label} al curso activo ${toCourse.label}?\n\n`;
-    if (doGroups) summary += `• Grupos: ${groupEntries.length} grupo(s) con todo su alumnado\n`;
-    if (doActivities) summary += `• Actividades: ${userActivities.length} actividad(es) propia(s)\n`;
-    summary += '\nNo se elimina nada: los datos se añaden al curso activo.';
-    if (!confirm(summary)) return;
-
-    try {
-        // 1) Copiar grupos con su alumnado
-        let importedGroups = 0;
-        const renamed = [];
-        if (doGroups && groupEntries.length) {
-            const existingNames = new Set(Object.values(toCourse.groups || {}).map(g => ((g && g.name) || '').trim().toLowerCase()));
-            const updates = {};
-            for (const [, g] of groupEntries) {
-                let name = ((g && g.name) || 'Grupo').trim() || 'Grupo';
-                if (existingNames.has(name.toLowerCase())) {
-                    // Colisión de nombre: renombrar indicando el curso de origen
-                    const alt = `${name} (${fromCourse.label})`;
-                    if (existingNames.has(alt.toLowerCase())) continue; // ya existe incluso con sufijo
-                    renamed.push(name);
-                    name = alt;
-                }
-                const students = Array.isArray(g.students) ? g.students.map(s => ({ fullName: (s && s.fullName) || '' })) : [];
-                const newRef = fbDb.ref(`${FB_COURSES_PATH}/${toCourse.id}/groups`).push();
-                updates[newRef.key] = {
-                    appId: FB_APP_ID,
-                    name: name,
-                    level: (g && g.level) || '',
-                    students: students,
-                    createdAt: Date.now(),
-                    importedFrom: fromCourse.id
-                };
-                existingNames.add(name.toLowerCase());
-                importedGroups++;
-            }
-            if (Object.keys(updates).length) {
-                await fbDb.ref(`${FB_COURSES_PATH}/${toCourse.id}/groups`).update(updates);
-            }
+    if (!confirm(`¿Importar ${userActivities.length} actividad(es) del curso ${fromCourse.label} al curso ${toCourse.label}?\n\nSe crearán copias de las actividades en el curso actual.`)) return;
+    const promises = userActivities.map(a => {
+        const now = Date.now();
+        // Bug fix: copia profunda del registro para evitar compartir referencias
+        // de objetos anidados (como data) entre el original y la copia.
+        const newRecord = JSON.parse(JSON.stringify(a));
+        delete newRecord.id;
+        newRecord.createdAt = now;
+        newRecord.updatedAt = now;
+        newRecord.courseId = fbCurrentCourseId; // asociar al curso actual
+        // Bug fix: si es un registro de calificaciones (kind=scores), eliminar
+        // configId y configRef porque apuntan a la config original del curso
+        // anterior, que no existe en el nuevo curso. El usuario podrá
+        // re-vincularlas manualmente si lo necesita.
+        if (newRecord.kind === 'scores') {
+            delete newRecord.configId;
+            delete newRecord.configRef;
         }
-        // 2) Copiar actividades propias del usuario
-        let importedActs = 0;
-        if (doActivities && userActivities.length) {
-            const promises = userActivities.map(a => {
-                const now = Date.now();
-                // Copia profunda para evitar compartir referencias de objetos anidados
-                const newRecord = JSON.parse(JSON.stringify(a));
-                delete newRecord.id;
-                newRecord.createdAt = now;
-                newRecord.updatedAt = now;
-                newRecord.courseId = toCourse.id; // asociar al curso activo
-                // Si es un registro de calificaciones (kind=scores), eliminar configId
-                // y configRef porque apuntan a la config original del curso anterior
-                if (newRecord.kind === 'scores') {
-                    delete newRecord.configId;
-                    delete newRecord.configRef;
-                }
-                return fbDb.ref(FB_ACTIVITIES_PATH).push(newRecord);
-            });
-            await Promise.all(promises);
-            importedActs = userActivities.length;
-        }
-        let msg = `✅ Importación completada del curso ${fromCourse.label} al curso ${toCourse.label}.\n\n• ${importedGroups} grupo(s) importado(s)\n• ${importedActs} actividad(es) importada(s)`;
-        if (renamed.length) msg += `\n\nGrupos renombrados por colisión de nombre:\n• ${renamed.join('\n• ')}`;
-        alert(msg);
-        const groupsModal = document.getElementById('fbGroupsModal');
-        if (groupsModal && groupsModal.classList.contains('show')) {
-            fb_renderGroupsModalBody();
-        }
-    } catch (err) {
-        alert('Error al importar: ' + (err && err.message ? err.message : err));
-    }
+        return fbDb.ref(FB_ACTIVITIES_PATH).push(newRecord);
+    });
+    Promise.all(promises)
+        .then(() => alert(`✅ ${userActivities.length} actividades importadas al curso ${toCourse.label}.`))
+        .catch(err => alert('Error al importar: ' + err.message));
 }
 
 // === RENDERIZADO DEL MODAL DE GESTIÓN DE CURSOS Y GRUPOS ===
@@ -8264,33 +8037,22 @@ function fb_renderGroupsModalBody() {
         body.innerHTML = '<div class="alert alert-warning mb-0"><i class="bi bi-exclamation-triangle"></i> Debes iniciar sesión para gestionar cursos y grupos.</div>';
         return;
     }
-    // Curso efectivo actual del centro (fijado por admin o por fecha)
-    const effectiveCourseId = fb_getEffectiveCurrentCourseId();
-    const effectiveCourse = fbAllCourses.find(c => c.id === effectiveCourseId);
     // Construir opciones para el selector de curso del modal
-    const courseOptions = fbAllCourses.map(c => {
-        const isCenterCurrent = (c.id === effectiveCourseId);
-        return `<option value="${escapeHtml(c.id)}" ${c.id === fbCurrentCourseId ? 'selected' : ''}>${escapeHtml(c.label)}${c.archived ? ' (archivado)' : ''}${isCenterCurrent ? ' ● actual' : ''}</option>`;
-    }).join('');
-    const isAdminUser = fbCurrentUser && fbCurrentUser.role === 'admin';
-    const isCurrentCourseSel = fbCurrentCourseId && fbCurrentCourseId === effectiveCourseId;
+    const courseOptions = fbAllCourses.map(c =>
+        `<option value="${escapeHtml(c.id)}" ${c.id === fbCurrentCourseId ? 'selected' : ''}>${escapeHtml(c.label)}${c.archived ? ' (archivado)' : ''}</option>`
+    ).join('');
     // Selector de curso del modal (sincronizado con la cabecera)
     let html = `
-        <div class="alert alert-info small mb-3"><i class="bi bi-info-circle-fill"></i> <b>Cursos académicos</b>: cada uno va del 1 de septiembre al 31 de agosto del año siguiente. Puedes crear y eliminar cursos (el curso actual no se puede eliminar). El <b>administrador</b> puede fijar el curso actual del centro para todos los usuarios (aunque no coincida con la fecha) e importar datos del curso anterior al presente.</div>
-        <div class="d-flex flex-wrap gap-2 mb-1 align-items-center">
+        <div class="alert alert-info small mb-3"><i class="bi bi-info-circle-fill"></i> Gestiona los cursos académicos (1 sep - 31 ago) y los grupos de alumnado asociados. Desde aquí puedes guardar la lista de alumnos actual como un grupo reutilizable, o importar alumnos de un grupo guardado a la app activa.</div>
+        <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
             <div class="input-group input-group-sm" style="max-width:280px;">
                 <span class="input-group-text"><i class="bi bi-mortarboard"></i> Curso activo</span>
                 <select id="fbGroupsCourseSelect" class="form-select form-select-sm">${courseOptions || '<option value="">Sin cursos</option>'}</select>
             </div>
             <button class="btn btn-outline-success btn-sm" id="fbGroupsCreateCourseBtn"><i class="bi bi-plus-circle"></i> Crear curso</button>
             <button class="btn btn-outline-warning btn-sm" id="fbGroupsToggleArchiveBtn" ${!fbCurrentCourseId ? 'disabled' : ''}><i class="bi bi-archive"></i> Archivar/Desarchivar</button>
-            <button class="btn btn-outline-danger btn-sm" id="fbGroupsDeleteCourseBtn" ${!fbCurrentCourseId || isCurrentCourseSel ? 'disabled' : ''} title="${isCurrentCourseSel ? 'El curso actual no se puede eliminar' : 'Eliminar curso'}"><i class="bi bi-trash"></i> Eliminar curso</button>
-            ${isAdminUser ? `
-                <button class="btn btn-outline-primary btn-sm" id="fbGroupsSetCurrentBtn" ${!fbCurrentCourseId ? 'disabled' : ''} title="Fijar el curso seleccionado como curso actual del centro (aplica a todos los usuarios, aunque no coincida con la fecha)"><i class="bi bi-pin-angle"></i> Fijar como curso del centro</button>
-                ${fbActiveCourseOverrideId ? '<button class="btn btn-outline-secondary btn-sm" id="fbGroupsAutoCourseBtn" title="Volver al cálculo automático del curso según la fecha"><i class="bi bi-arrow-clockwise"></i> Curso automático (fecha)</button>' : ''}
-            ` : ''}
+            <button class="btn btn-outline-danger btn-sm" id="fbGroupsDeleteCourseBtn" ${!fbCurrentCourseId ? 'disabled' : ''}><i class="bi bi-trash"></i> Eliminar curso</button>
         </div>
-        ${effectiveCourse ? `<div class="small text-muted mb-3"><i class="bi bi-pin-map-fill"></i> Curso actual del centro: <strong>${escapeHtml(effectiveCourse.label)}</strong> ${fbActiveCourseOverrideId ? '<span class="badge bg-warning text-dark">fijado por el administrador</span>' : '<span class="badge bg-success">automático (por fecha)</span>'}</div>` : ''}
     `;
     // Curso actual y sus grupos
     const course = fbAllCourses.find(c => c.id === fbCurrentCourseId);
@@ -8298,8 +8060,8 @@ function fb_renderGroupsModalBody() {
         html += `
             <div class="alert alert-secondary mb-3"><i class="bi bi-info-circle"></i> No hay ningún curso seleccionado. Crea uno con el botón "Crear curso".</div>
             <hr>
-            <h6 class="fw-bold"><i class="bi bi-people me-1"></i>Importar datos desde un curso anterior</h6>
-            ${fb_renderImportDataBlock(null)}
+            <h6 class="fw-bold"><i class="bi bi-people me-1"></i>Importar actividades desde otro curso</h6>
+            ${fb_renderImportActivitiesBlock()}
         `;
         body.innerHTML = html;
         // Listeners
@@ -8309,8 +8071,8 @@ function fb_renderGroupsModalBody() {
     html += `
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center" style="background:linear-gradient(145deg, #0b4b6b, #0d6efd); color:white;">
-                <span><i class="bi bi-mortarboard-fill me-1"></i>Curso: <strong>${escapeHtml(course.label)}</strong> ${course.id === effectiveCourseId ? '<span class="badge bg-success ms-1" title="Es el curso actual del centro (aplica a todos los usuarios)">Curso actual del centro</span>' : ''} ${course.archived ? '<span class="badge bg-warning text-dark ms-1">Archivado</span>' : ''}</span>
-                <span class="small">Del 01/09/${course.yearStart} al 31/08/${course.yearEnd}</span>
+                <span><i class="bi bi-mortarboard-fill me-1"></i>Curso: <strong>${escapeHtml(course.label)}</strong> ${course.archived ? '<span class="badge bg-warning text-dark ms-1">Archivado</span>' : ''}</span>
+                <span class="small">Años: ${course.yearStart} → ${course.yearEnd}</span>
             </div>
             <div class="card-body">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-2 gap-2">
@@ -8329,8 +8091,8 @@ function fb_renderGroupsModalBody() {
             <span class="text-muted small" id="fbGroupsCurrentAppLabel"></span>
         </div>
         <hr>
-        <h6 class="fw-bold"><i class="bi bi-cloud-arrow-down me-1"></i>Importar datos desde un curso anterior</h6>
-        ${fb_renderImportDataBlock(course)}
+        <h6 class="fw-bold"><i class="bi bi-cloud-arrow-down me-1"></i>Importar actividades desde otro curso</h6>
+        ${fb_renderImportActivitiesBlock(course)}
     `;
     body.innerHTML = html;
     // Indicar la app actual
@@ -8397,39 +8159,28 @@ function fb_renderGroupsList(course) {
     return html;
 }
 
-// Construye el bloque HTML para importar datos (grupos y/o actividades)
-// desde un curso anterior al curso activo
-function fb_renderImportDataBlock(currentCourse) {
-    if (!currentCourse) {
-        return '<div class="text-muted small"><i class="bi bi-info-circle"></i> Selecciona o crea un curso activo para poder importar datos de cursos anteriores.</div>';
-    }
+// Construye el bloque HTML para importar actividades desde otro curso
+function fb_renderImportActivitiesBlock(currentCourse) {
     const previousCourses = fbAllCourses.filter(c => {
-        // Cursos anteriores al activo
+        if (!currentCourse) return true;
+        // Cursos anteriores al actual
         return fb_compareCourses(c.label, currentCourse.label) < 0;
-    }).reverse(); // más recientes primero (el curso anterior inmediato, arriba)
+    });
     if (previousCourses.length === 0) {
-        return '<div class="text-muted small"><i class="bi bi-info-circle"></i> No hay cursos anteriores disponibles para importar datos.</div>';
+        return '<div class="text-muted small"><i class="bi bi-info-circle"></i> No hay cursos anteriores disponibles para importar actividades.</div>';
     }
     const options = previousCourses.map(c =>
-        `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}${c.archived ? ' (archivado)' : ''}${c.id === fbActiveCourseOverrideId ? ' ← curso del centro' : ''}</option>`
+        `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}${c.archived ? ' (archivado)' : ''}</option>`
     ).join('');
     return `
-        <div class="d-flex flex-wrap gap-3 align-items-center">
-            <div class="input-group input-group-sm" style="max-width:280px;">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <div class="input-group input-group-sm" style="max-width:320px;">
                 <span class="input-group-text"><i class="bi bi-calendar"></i> Curso origen</span>
                 <select id="fbGroupsImportCourseSelect" class="form-select form-select-sm">${options}</select>
             </div>
-            <div class="form-check mb-0">
-                <input class="form-check-input" type="checkbox" id="fbImportDataGroups" checked>
-                <label class="form-check-label small" for="fbImportDataGroups"><i class="bi bi-people-fill"></i> Grupos y alumnado</label>
-            </div>
-            <div class="form-check mb-0">
-                <input class="form-check-input" type="checkbox" id="fbImportDataActivities" checked>
-                <label class="form-check-label small" for="fbImportDataActivities"><i class="bi bi-cloud"></i> Mis actividades</label>
-            </div>
-            <button class="btn btn-primary btn-sm" id="fbGroupsImportDataBtn"><i class="bi bi-cloud-arrow-down"></i> Importar datos</button>
+            <button class="btn btn-primary btn-sm" id="fbGroupsImportActivitiesBtn"><i class="bi bi-cloud-arrow-down"></i> Importar actividades</button>
         </div>
-        <div class="form-text small mt-1"><i class="bi bi-info-circle"></i> Los grupos se copian al curso activo con todos sus alumnos (si ya existe un grupo con el mismo nombre, se renombra indicando el curso de origen). Las actividades propias del curso origen se copian asociadas al curso activo.</div>
+        <div class="form-text small mt-1"><i class="bi bi-info-circle"></i> Solo se importan actividades del usuario actual desde un curso anterior al activo. Se crean copias en el curso actual.</div>
     `;
 }
 
@@ -8467,23 +8218,12 @@ function fb_attachGroupsModalListeners() {
         const level = prompt('Nivel educativo (opcional, ej: 2º ESO):', '') || '';
         fb_createGroup(name, level);
     });
-    // (admin) Fijar el curso seleccionado como curso actual del centro
-    document.getElementById('fbGroupsSetCurrentBtn')?.addEventListener('click', () => {
-        const course = fbAllCourses.find(c => c.id === fbCurrentCourseId);
-        if (course) fb_adminSetCurrentCourse(course.id);
-    });
-    // (admin) Restaurar el curso automático por fecha
-    document.getElementById('fbGroupsAutoCourseBtn')?.addEventListener('click', fb_adminResetCurrentCourse);
     // Guardar alumnos actuales como grupo
     document.getElementById('fbGroupsSaveStudentsBtn')?.addEventListener('click', fb_saveCurrentStudentsAsGroup);
-    // Importar datos (grupos y/o actividades) desde un curso anterior
-    document.getElementById('fbGroupsImportDataBtn')?.addEventListener('click', () => {
+    // Importar actividades
+    document.getElementById('fbGroupsImportActivitiesBtn')?.addEventListener('click', () => {
         const sel = document.getElementById('fbGroupsImportCourseSelect');
-        if (!sel) return;
-        fb_importDataFromCourse(sel.value, {
-            groups: document.getElementById('fbImportDataGroups')?.checked,
-            activities: document.getElementById('fbImportDataActivities')?.checked
-        });
+        if (sel) fb_importActivitiesFromCourse(sel.value);
     });
     // Delegados: importar alumnos, toggle lista, eliminar grupo, añadir alumno, eliminar alumno
     const body = document.getElementById('fbGroupsModalBody');
@@ -9093,7 +8833,6 @@ function fb_deleteOwnAccount() {
     if (fbSubjectsUnsub) { try { fbSubjectsUnsub(); } catch(e) {} fbSubjectsUnsub = null; }
     if (fbUsersUnsub) { try { fbUsersUnsub(); } catch(e) {} fbUsersUnsub = null; }
     if (fbCoursesUnsub) { try { fbCoursesUnsub(); } catch(e) {} fbCoursesUnsub = null; }
-    if (fbSettingsUnsub) { try { fbSettingsUnsub(); } catch(e) {} fbSettingsUnsub = null; }
     if (typeof autosave_teardownFirebaseSync === 'function') {
         try { autosave_teardownFirebaseSync(); } catch(e) {}
     }
@@ -9146,402 +8885,6 @@ function fb_adminDeleteUserActivities(u) {
     Promise.all(promises)
         .then(() => alert(`✅ Eliminadas ${userActivities.length} actividades de "${u.displayName}".`))
         .catch(err => alert('Error al eliminar algunas actividades: ' + err.message));
-}
-
-// ============================================================
-// === IMPORTACIÓN MASIVA DE USUARIOS DESDE EXCEL (solo admin) ===
-// ============================================================
-// Soporta dos formatos de fichero:
-//   A) RelPerCen de Séneca: hoja «PERSONAL DEL CENTRO» con columna «Usuario IdEA»
-//      → contraseña inicial de cada usuario = su propio usuario IdEA
-//   B) Listado simplificado: Nombre · Usuario · Contraseña · Rol · Tutoría
-//      (si la contraseña viene vacía, se usa el usuario IdEA)
-// Las cabeceras se normalizan (minúsculas, sin acentos ni signos) para
-// tolerar variantes del fichero exportado por Séneca o editado a mano.
-
-let _fbImportParsed = null;   // usuarios parseados pendientes de importar
-let _fbImportRunning = false; // bloquea ejecuciones simultáneas
-
-// Normaliza una cabecera: minúsculas, sin acentos, solo caracteres alfanuméricos
-function fb_normHeader(h) {
-    return String(h ?? '')
-        .trim().toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quitar acentos
-        .replace(/[^a-z0-9]/g, ''); // eliminar /, espacios, puntos, etc.
-}
-
-// Devuelve el índice de la primera columna cuya cabecera coincida con alguna variante
-function fb_pickColumn(headers, candidates) {
-    for (const cand of candidates) {
-        const idx = headers.indexOf(cand);
-        if (idx !== -1) return idx;
-    }
-    return -1;
-}
-
-// Parsea un workbook de SheetJS y devuelve { users:[], errors:[], format:'' }
-function fb_parseUsersWorkbook(wb) {
-    const users = [];
-    const errors = [];
-    const seen = new Set();
-    let format = '';
-    if (!wb || !wb.SheetNames || !wb.SheetNames.length) {
-        errors.push('El fichero no contiene ninguna hoja de cálculo.');
-        return { users, errors, format };
-    }
-    for (const sheetName of wb.SheetNames) {
-        const sheet = wb.Sheets[sheetName];
-        if (!sheet) continue;
-        let rows;
-        try {
-            rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-        } catch (e) { continue; }
-        if (!rows || rows.length < 2) continue;
-        // Localizar la fila de cabeceras: la primera (hasta la fila 10) que
-        // contenga una columna de usuario reconocible.
-        let headerRow = -1, cUser = -1, cName = -1, cPass = -1, cRole = -1, cTut = -1;
-        for (let r = 0; r < Math.min(rows.length, 10); r++) {
-            const headers = (rows[r] || []).map(fb_normHeader);
-            if (!headers.length) continue;
-            const cu = fb_pickColumn(headers, ['usuarioidea', 'usuariodeea', 'usuario', 'username']);
-            if (cu === -1) continue;
-            const cn = fb_pickColumn(headers, ['empleadoslasha', 'empleadoa', 'empleado', 'nombre', 'nombrecompleto', 'nombreyapellidos', 'apellidosynombre', 'profesor', 'docente']);
-            const cp = fb_pickColumn(headers, ['contrasena', 'contrasenia', 'password', 'clave', 'pass']);
-            const cr = fb_pickColumn(headers, ['rol', 'perfil', 'tipousuario']);
-            const ct = fb_pickColumn(headers, ['tutoria', 'tutorias', 'grupo', 'grupotutoria']);
-            headerRow = r; cUser = cu; cName = cn; cPass = cp; cRole = cr; cTut = ct;
-            if (!format) {
-                format = (headers.includes('usuarioidea') || headers.includes('usuariodeea')) ? 'RelPerCen (Séneca)' : 'Listado simplificado';
-            }
-            break;
-        }
-        if (headerRow === -1) {
-            errors.push(`Hoja "${sheetName}": no se encontró una columna de usuario (se admite «Usuario IdEA» o «Usuario»). Hoja omitida.`);
-            continue;
-        }
-        // Recorrer las filas de datos
-        for (let r = headerRow + 1; r < rows.length; r++) {
-            const row = rows[r] || [];
-            if (!row.length) continue;
-            const rawUser = String(row[cUser] ?? '').trim();
-            if (!rawUser) continue; // fila sin usuario (vacía) → ignorar
-            const username = rawUser.toLowerCase().replace(/\s+/g, '');
-            if (!fb_isValidUsername(username)) {
-                errors.push(`Fila ${r + 1} (hoja "${sheetName}"): "${rawUser}" no es un usuario válido (3-30 caracteres alfanuméricos, . _ -).`);
-                continue;
-            }
-            if (seen.has(username)) {
-                errors.push(`Fila ${r + 1} (hoja "${sheetName}"): usuario "${username}" duplicado en el fichero.`);
-                continue;
-            }
-            // Contraseña: la del fichero o, si no viene, el propio usuario IdEA
-            let password = (cPass >= 0 ? String(row[cPass] ?? '').trim() : '');
-            if (!password) password = username;
-            if (password.length < 6) {
-                errors.push(`Fila ${r + 1} (hoja "${sheetName}"): usuario "${username}" omitido — su contraseña tendría menos de 6 caracteres.`);
-                continue;
-            }
-            // Nombre para mostrar
-            let displayName = (cName >= 0 ? String(row[cName] ?? '').trim() : '');
-            if (!displayName) displayName = username;
-            displayName = displayName.replace(/\s+/g, ' ');
-            // Rol: solo se acepta "admin" si la celda lo indica; el resto son profesores
-            const rawRole = (cRole >= 0 ? fb_normHeader(row[cRole]) : '');
-            const role = rawRole.includes('admin') ? 'admin' : 'user';
-            // Tutoría (opcional)
-            const tutoria = (cTut >= 0 ? String(row[cTut] ?? '').trim() : '');
-            seen.add(username);
-            users.push({ displayName, username, password, role, tutoria });
-        }
-    }
-    if (!users.length && !errors.length) {
-        errors.push('No se han encontrado filas de usuarios válidas en el fichero.');
-    }
-    return { users, errors, format };
-}
-
-// Al seleccionar un fichero: leer, parsear y mostrar la previsualización
-function fb_importUsers_onFile(evt) {
-    const file = evt.target.files && evt.target.files[0];
-    if (!file) return;
-    const msgEl = document.getElementById('fbImportParseMsg');
-    const execBtn = document.getElementById('fbImportExecuteBtn');
-    msgEl.innerHTML = '<span class="text-info"><i class="bi bi-arrow-repeat"></i> Leyendo fichero…</span>';
-    const reader = new FileReader();
-    reader.onload = e => {
-        try {
-            const wb = XLSX.read(e.target.result, { type: 'binary' });
-            const parsed = fb_parseUsersWorkbook(wb);
-            _fbImportParsed = parsed.users;
-            document.getElementById('fbImportStep1').style.display = 'none';
-            document.getElementById('fbImportStep2').style.display = '';
-            document.getElementById('fbImportProgress').style.display = 'none';
-            execBtn.style.display = '';
-            execBtn.disabled = _fbImportParsed.length === 0;
-            document.getElementById('fbImportCount').textContent = _fbImportParsed.length;
-            document.getElementById('fbImportFormatBadge').textContent = parsed.format || 'Formato no identificado';
-            fb_renderImportPreview(parsed);
-            msgEl.innerHTML = '';
-        } catch (err) {
-            console.error('Error leyendo Excel:', err);
-            msgEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> No se pudo leer el fichero: ${escapeHtml(err.message || String(err))}</span>`;
-            evt.target.value = '';
-        }
-    };
-    reader.onerror = () => {
-        msgEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> No se pudo leer el fichero.</span>';
-    };
-    reader.readAsBinaryString(file);
-}
-
-// Dibuja la tabla de previsualización de usuarios a importar
-function fb_renderImportPreview(parsed) {
-    const body = document.getElementById('fbImportPreviewBody');
-    const errEl = document.getElementById('fbImportParseErrors');
-    if (!body) return;
-    body.innerHTML = '';
-    parsed.users.forEach((u, i) => {
-        const existing = fbAllUsers.find(x => (x.username || '').toLowerCase() === u.username);
-        const tr = document.createElement('tr');
-        const status = existing
-            ? '<span class="badge bg-secondary">Ya existe</span>'
-            : '<span class="badge bg-success">Nuevo</span>';
-        tr.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${escapeHtml(u.displayName)}</td>
-            <td class="fw-semibold">${escapeHtml(u.username)}</td>
-            <td><span class="badge ${u.role === 'admin' ? 'bg-danger' : 'bg-primary'}">${u.role === 'admin' ? 'Admin' : 'Profesor'}</span></td>
-            <td>${escapeHtml(u.tutoria || '—')}</td>
-            <td>${status}</td>`;
-        body.appendChild(tr);
-    });
-    if (parsed.errors && parsed.errors.length) {
-        errEl.innerHTML = '<div class="alert alert-warning py-1 px-2 mb-0"><i class="bi bi-exclamation-triangle"></i> Filas ignoradas:<ul class="mb-0 ps-3">' + parsed.errors.map(e => `<li>${escapeHtml(e)}</li>`).join('') + '</ul></div>';
-    } else {
-        errEl.innerHTML = '';
-    }
-}
-
-// Vuelve al paso 1 (limpia el asistente de importación)
-function fb_importUsers_reset() {
-    _fbImportParsed = null;
-    const s1 = document.getElementById('fbImportStep1');
-    const s2 = document.getElementById('fbImportStep2');
-    const prog = document.getElementById('fbImportProgress');
-    if (s1) s1.style.display = '';
-    if (s2) s2.style.display = 'none';
-    if (prog) prog.style.display = 'none';
-    const execBtn = document.getElementById('fbImportExecuteBtn');
-    if (execBtn) { execBtn.style.display = 'none'; execBtn.disabled = true; }
-    const fi = document.getElementById('fbImportFileInput');
-    if (fi) fi.value = '';
-    const pm = document.getElementById('fbImportParseMsg');
-    if (pm) pm.innerHTML = '';
-}
-
-// Ejecuta la importación masiva.
-// Usa una instancia SECUNDARIA de Firebase Auth para crear las cuentas sin
-// cerrar la sesión del administrador en la app principal.
-async function fb_importUsers_execute() {
-    if (!fbCurrentUser || fbCurrentUser.role !== 'admin') { alert('Solo un administrador puede importar usuarios.'); return; }
-    if (!fbAuth || !fbAuth.currentUser) { alert('Tu sesión ha caducado. Vuelve a iniciar sesión e inténtalo de nuevo.'); return; }
-    if (!_fbImportParsed || !_fbImportParsed.length) { alert('No hay usuarios para importar. Selecciona antes un fichero válido.'); return; }
-    if (_fbImportRunning) return;
-    if (!confirm(`¿Importar ${_fbImportParsed.length} usuario(s)?\n\nSe creará una cuenta por usuario con:\n• Usuario: su usuario IdEA\n• Contraseña inicial: su propio usuario IdEA\n\nLos usuarios que ya existen en la aplicación se omitirán.`)) return;
-    _fbImportRunning = true;
-    const execBtn = document.getElementById('fbImportExecuteBtn');
-    execBtn.disabled = true;
-    const progWrap = document.getElementById('fbImportProgress');
-    const bar = document.getElementById('fbImportProgressBar');
-    const resEl = document.getElementById('fbImportResults');
-    progWrap.style.display = '';
-    resEl.innerHTML = '';
-
-    const total = _fbImportParsed.length;
-    let done = 0, created = 0, restored = 0, updated = 0, skipped = 0, failed = 0;
-    const results = [];
-
-    // App secundaria de Firebase
-    let secApp = null;
-    try {
-        try { secApp = firebase.app('fbImportSecondary'); } catch (e) { secApp = null; }
-        if (!secApp) secApp = firebase.initializeApp(FB_CONFIG, 'fbImportSecondary');
-    } catch (e) {
-        alert('No se pudo inicializar Firebase para la importación: ' + e.message);
-        _fbImportRunning = false; execBtn.disabled = false;
-        return;
-    }
-    const secAuth = secApp.auth();
-    const overwriteRole = document.getElementById('fbImportOverwriteRole')?.checked;
-
-    const addResult = (icon, cls, text) => {
-        results.push(`<div class="${cls}"><i class="bi ${icon}"></i> ${text}</div>`);
-        resEl.innerHTML = results.slice(-300).join('');
-        resEl.scrollTop = resEl.scrollHeight;
-    };
-    const updateProgress = () => {
-        const pct = total ? Math.round((done / total) * 100) : 100;
-        bar.style.width = pct + '%';
-        bar.textContent = `${pct}% (${done}/${total})`;
-    };
-    updateProgress();
-
-    for (const u of _fbImportParsed) {
-        const email = fb_usernameToEmail(u.username);
-        try {
-            const existing = fbAllUsers.find(x => (x.username || '').toLowerCase() === u.username);
-            if (existing) {
-                if (overwriteRole && existing.uid !== fbCurrentUser.uid && (existing.role || 'user') !== u.role) {
-                    // Evitar dejar la app sin administradores
-                    const adminCount = fbAllUsers.filter(x => x.role === 'admin').length;
-                    if (existing.role === 'admin' && u.role === 'user' && adminCount <= 1) {
-                        skipped++;
-                        addResult('bi-exclamation-circle', 'text-warning', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): es el único administrador; rol no modificado.`);
-                    } else {
-                        const patch = { role: u.role };
-                        if (u.tutoria) patch.tutoria = u.tutoria;
-                        await fbDb.ref(`${FB_USERS_PATH}/${existing.uid}`).update(patch);
-                        updated++;
-                        addResult('bi-arrow-repeat', 'text-info', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): ya existía — rol actualizado a ${u.role === 'admin' ? 'Administrador' : 'Profesor'}.`);
-                    }
-                } else {
-                    skipped++;
-                    addResult('bi-slash-circle', 'text-muted', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): ya estaba registrado, se omite.`);
-                }
-            } else {
-                let uid = null, wasRestore = false;
-                try {
-                    // 1) Crear la cuenta de autenticación (contraseña inicial = usuario IdEA)
-                    const cred = await secAuth.createUserWithEmailAndPassword(email, u.password);
-                    uid = cred.user.uid;
-                    try { await cred.user.updateProfile({ displayName: u.displayName }); } catch (e) {}
-                    try { await secAuth.signOut(); } catch (e) {}
-                } catch (err) {
-                    if (err && err.code === 'auth/email-already-in-use') {
-                        // 2) La cuenta de Auth ya existía (p. ej. cuenta compartida del
-                        //    proyecto o registro de la app borrado). Si la contraseña del
-                        //    fichero coincide, recuperamos el uid iniciando sesión en la
-                        //    app secundaria; si no, se omite.
-                        try {
-                            const si = await secAuth.signInWithEmailAndPassword(email, u.password);
-                            uid = si.user.uid;
-                            try { await secAuth.signOut(); } catch (e) {}
-                        } catch (e2) { uid = null; }
-                        if (uid) {
-                            const snap = await fbDb.ref(`${FB_USERS_PATH}/${uid}`).once('value');
-                            if (snap.exists()) {
-                                skipped++;
-                                addResult('bi-slash-circle', 'text-muted', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): la cuenta ya existía, se omite.`);
-                                uid = null;
-                            } else {
-                                wasRestore = true;
-                            }
-                        } else {
-                            skipped++;
-                            addResult('bi-exclamation-circle', 'text-warning', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): la cuenta de acceso ya existía con otra contraseña; se omite (puede entrar con su contraseña actual).`);
-                            uid = null;
-                        }
-                    } else {
-                        throw err;
-                    }
-                }
-                if (uid) {
-                    // 3) Crear el registro del usuario en la base de datos
-                    const record = {
-                        uid: uid,
-                        username: u.username,
-                        email: email,
-                        displayName: u.displayName,
-                        role: u.role,
-                        appId: FB_APP_ID,
-                        source: 'import',
-                        createdAt: Date.now(),
-                        importedAt: Date.now()
-                    };
-                    if (u.tutoria) record.tutoria = u.tutoria;
-                    await fbDb.ref(`${FB_USERS_PATH}/${uid}`).set(record);
-                    if (wasRestore) {
-                        restored++;
-                        addResult('bi-cloud-arrow-down', 'text-info', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): cuenta recuperada — registro de la app creado (contraseña correcta).`);
-                    } else {
-                        created++;
-                        addResult('bi-person-check', 'text-success', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): cuenta creada. Contraseña inicial: <b>${escapeHtml(u.username)}</b>.`);
-                    }
-                }
-            }
-        } catch (err) {
-            failed++;
-            console.error('Error importando usuario:', u, err);
-            let msg = err && err.message ? err.message : String(err);
-            if (err && err.code === 'auth/weak-password') msg = 'contraseña demasiado débil (mínimo 6 caracteres).';
-            if (err && err.code === 'auth/too-many-requests') msg = 'demasiadas peticiones a Firebase; reintenta en unos minutos.';
-            addResult('bi-x-circle', 'text-danger', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): error — ${escapeHtml(msg)}`);
-        }
-        done++;
-        updateProgress();
-        await new Promise(r => setTimeout(r, 300)); // pausa entre cuentas para no saturar Firebase
-    }
-
-    // Cerrar y eliminar la app secundaria
-    try { await secAuth.signOut(); } catch (e) {}
-    try { await secApp.delete(); } catch (e) {}
-
-    addResult('bi-check-circle-fill', 'text-success fw-bold', `<b>Resumen:</b> ${created} cuenta(s) creada(s), ${restored} recuperada(s), ${updated} actualizada(s), ${skipped} omitida(s), ${failed} con error.`);
-    if (created + restored > 0) {
-        addResult('bi-key', 'text-info', '<b>Acceso:</b> los usuarios entran con su usuario IdEA y como contraseña su propio usuario IdEA. Podrán cambiarla desde su panel de cuenta (botón «Cambiar contraseña») tras iniciar sesión.');
-    }
-    bar.classList.remove('progress-bar-animated');
-    _fbImportRunning = false;
-    execBtn.style.display = 'none';
-    try { fb_renderUsers(); } catch (e) {}
-}
-
-// === CAMBIO DE CONTRASEÑA DEL PROPIO USUARIO ===
-// Requiere reautenticación con la contraseña actual y luego actualiza la nueva.
-async function fb_changeOwnPassword() {
-    const msgEl = document.getElementById('fbChangePwMessage');
-    const show = (text, type) => {
-        if (!msgEl) return;
-        const cls = type === 'success' ? 'alert-success' : (type === 'warning' ? 'alert-warning' : 'alert-danger');
-        const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
-        msgEl.innerHTML = `<div class="alert ${cls} py-1 px-2 mb-0"><i class="bi ${icon}"></i> ${escapeHtml(text)}</div>`;
-    };
-    const authUser = fbAuth && fbAuth.currentUser;
-    if (!authUser) { show('No hay sesión activa. Inicia sesión de nuevo.', 'danger'); return; }
-    const cur = document.getElementById('fbChangePwCurrent').value;
-    const nw = document.getElementById('fbChangePwNew').value;
-    const cf = document.getElementById('fbChangePwConfirm').value;
-    if (!cur || !nw || !cf) { show('Completa todos los campos.', 'danger'); return; }
-    if (nw.length < 6) { show('La contraseña nueva debe tener al menos 6 caracteres.', 'danger'); return; }
-    if (nw !== cf) { show('Las contraseñas nuevas no coinciden.', 'danger'); return; }
-    if (nw === cur) { show('La contraseña nueva debe ser distinta de la actual.', 'warning'); return; }
-    const confirmBtn = document.getElementById('fbChangePwConfirmBtn');
-    confirmBtn.disabled = true;
-    try {
-        const email = authUser.email || fb_usernameToEmail((fbCurrentUser && fbCurrentUser.username) || '');
-        const cred = firebase.auth.EmailAuthProvider.credential(email, cur);
-        await authUser.reauthenticateWithCredential(cred);
-        await authUser.updatePassword(nw);
-        show('Contraseña actualizada correctamente.', 'success');
-        document.getElementById('fbChangePwCurrent').value = '';
-        document.getElementById('fbChangePwNew').value = '';
-        document.getElementById('fbChangePwConfirm').value = '';
-        setTimeout(() => {
-            try { bootstrap.Modal.getOrCreateInstance(document.getElementById('fbChangePasswordModal')).hide(); } catch (e) {}
-            alert('✅ Tu contraseña se ha cambiado correctamente.\n\nRecuerda usar la nueva contraseña en tu próximo inicio de sesión.');
-        }, 600);
-    } catch (err) {
-        console.error('Error cambiando contraseña:', err);
-        let msg = 'No se pudo cambiar la contraseña: ' + (err.message || '');
-        if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'La contraseña actual no es correcta.';
-        else if (err.code === 'auth/weak-password') msg = 'La contraseña nueva es demasiado débil (mínimo 6 caracteres).';
-        else if (err.code === 'auth/requires-recent-login') msg = 'Por seguridad, cierra sesión, vuelve a iniciarla e inténtalo de nuevo.';
-        else if (err.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Espera un momento e inténtalo de nuevo.';
-        else if (err.code === 'auth/network-request-failed') msg = 'Error de red. Comprueba tu conexión e inténtalo de nuevo.';
-        show(msg, 'danger');
-    } finally {
-        confirmBtn.disabled = false;
-    }
 }
 
 // === GUARDAR ACTIVIDAD EN LA NUBE ===
@@ -12189,7 +11532,7 @@ window.onload = function() {
             }
         }
         html += '<span class="me-1">· Espacio: <strong>' + (window.FB_APP_ID || 'multimateria_v2') + '</strong></span>';
-        html += '<span>· by @angelmicelti · Multimateria v2.2</span>';
+        html += '<span>· by @angelmicelti · Multimateria v2.0</span>';
         footer.innerHTML = html;
     }
     // Leer la versión desde sw.js. Funciona en http/https (GitHub Pages).
@@ -12441,37 +11784,6 @@ window.onload = function() {
         if (registerTab) new bootstrap.Tab(registerTab).show();
         bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAuthModal')).show();
     });
-    // === IMPORTAR USUARIOS DESDE EXCEL (solo admin) ===
-    let _fbImportReturnToAdmin = false;
-    document.getElementById('fbUsersImportBtn')?.addEventListener('click', () => {
-        _fbImportReturnToAdmin = true;
-        fb_importUsers_reset();
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAdminModal')).hide();
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('fbImportUsersModal')).show();
-    });
-    document.getElementById('fbImportUsersModal')?.addEventListener('hidden.bs.modal', () => {
-        // Al cerrar el asistente de importación, volver al panel de administración
-        if (_fbImportReturnToAdmin && fbCurrentUser && fbCurrentUser.role === 'admin') {
-            _fbImportReturnToAdmin = false;
-            fb_renderUsers();
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAdminModal')).show();
-        } else {
-            _fbImportReturnToAdmin = false;
-        }
-    });
-    document.getElementById('fbImportFileInput')?.addEventListener('change', fb_importUsers_onFile);
-    document.getElementById('fbImportExecuteBtn')?.addEventListener('click', fb_importUsers_execute);
-    document.getElementById('fbImportResetBtn')?.addEventListener('click', fb_importUsers_reset);
-    // === CAMBIAR CONTRASEÑA (usuario autenticado) ===
-    document.getElementById('fbAccountChangePasswordBtn')?.addEventListener('click', () => {
-        document.getElementById('fbChangePwCurrent').value = '';
-        document.getElementById('fbChangePwNew').value = '';
-        document.getElementById('fbChangePwConfirm').value = '';
-        document.getElementById('fbChangePwMessage').innerHTML = '';
-        bootstrap.Modal.getOrCreateInstance(document.getElementById('fbChangePasswordModal')).show();
-    });
-    document.getElementById('fbChangePwConfirmBtn')?.addEventListener('click', fb_changeOwnPassword);
-    document.getElementById('fbChangePwConfirm')?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fb_changeOwnPassword(); } });
     document.getElementById('fbUsersSearch')?.addEventListener('input', fb_renderUsers);
     document.getElementById('fbAdminActSearch')?.addEventListener('input', fb_renderAdminActivities);
     // Al cambiar a la pestaña de actividades del admin, renderizar la lista
