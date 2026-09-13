@@ -1652,7 +1652,7 @@
         <button type="button" class="btn btn-outline-secondary" id="btnAppInstrumentos"><i class="bi bi-grid-3x3-gap-fill"></i> Actividad por Instrumentos</button>
         <button type="button" class="btn btn-outline-info" id="btnAppPonderacion"><i class="bi bi-layers-half"></i> Ponderación</button>
         <button type="button" class="btn btn-outline-danger" id="btnAppRubricas"><i class="bi bi-grid-1x2-fill"></i> Rúbricas</button>
-        <a href="Tutorial_AppCalificaActividadesMateriaGeneral.pdf" class="btn btn-outline-danger ms-auto" id="btnTutorial" download><i class="bi bi-file-pdf"></i> Tutorial</a>
+        <a class="btn btn-outline-danger ms-auto" id="btnTutorial" href="Manual_Profesor.pdf" download="Manual_Profesor.pdf" title="Descargar el manual del perfil Profesor (PDF A4)"><i class="bi bi-person-workspace"></i> Manual</a>
     </div>
 
     <!-- Título dinámico de la pantalla actual (bajo la navbar) + botones de navegación de la app -->
@@ -7108,8 +7108,31 @@ function fb_showAuthMessage(text, type) {
     el.innerHTML = `<div class="alert ${cls} small py-2 px-3 mb-0"><i class="bi ${type==='success'?'bi-check-circle':(type==='danger'?'bi-exclamation-triangle':'bi-info-circle')}"></i> ${escapeHtml(text)}</div>`;
 }
 
+// === UI: manual por perfil (descarga directa, sin modal) ===
+// Cada perfil descarga directamente su propio manual: Administración → Manual_Administracion.pdf;
+// Profesor (o sin sesión iniciada, valor por defecto) → Manual_Profesor.pdf.
+// Ambos PDF se publican junto a index.html.
+function fb_updateManualLink() {
+    const a = document.getElementById('btnTutorial');
+    if (!a) return;
+    const isAdmin = !!(fbCurrentUser && fbCurrentUser.role === 'admin');
+    const file = isAdmin ? 'Manual_Administracion.pdf' : 'Manual_Profesor.pdf';
+    a.href = file;
+    a.setAttribute('download', file);
+    if (isAdmin) {
+        a.title = 'Descargar el manual del perfil Administración (PDF A4)';
+        a.innerHTML = '<i class="bi bi-shield-lock"></i> Manual Administración';
+    } else {
+        a.title = fbCurrentUser
+            ? 'Descargar el manual del perfil Profesor (PDF A4)'
+            : 'Descargar el manual del perfil Profesor (PDF A4). Inicia sesión como Administración para descargar su manual.';
+        a.innerHTML = '<i class="bi bi-person-workspace"></i> Manual' + (fbCurrentUser ? ' Profesor' : '');
+    }
+}
+
 // === UI: botón de cuenta ===
 function fb_updateAccountUI() {
+    fb_updateManualLink();
     const btn = document.getElementById('btnFbAccount');
     const userInfoBtn = document.getElementById('btnFbUserInfo');
     const groupsBtn = document.getElementById('btnFbGroups');
