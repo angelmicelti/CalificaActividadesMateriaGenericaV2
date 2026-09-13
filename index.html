@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>EVALUACIÓN CRITERIAL · MULTIMATERIA · V2.2</title>
+    <title>EVALUACIÓN CRITERIAL · MULTIMATERIA · V2.3</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <meta name="theme-color" content="#0b4b6b">
@@ -1409,23 +1409,6 @@
             background: rgba(255,255,255,0.5); border-radius: 50%;
             font-size: 0.8rem;
         }
-        .fb-sync-indicator {
-            display: inline-flex; align-items: center; gap: 4px;
-            font-size: 0.78rem; padding: 3px 10px; border-radius: 50px;
-            background: #f1f5f9; color: #64748b; margin-left: 6px;
-        }
-        .fb-sync-indicator.synced { background: #d1fae5; color: #065f46; }
-        .fb-sync-indicator.syncing { background: #fef3c7; color: #92400e; }
-        .fb-sync-indicator.error { background: #fee2e2; color: #991b1b; }
-        .fb-sync-indicator .pulse-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: currentColor; animation: fbPulse 1.5s infinite;
-        }
-        @keyframes fbPulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.3); }
-            100% { opacity: 1; transform: scale(1); }
-        }
 
         /* ===== AUTOSAVE INDICATOR ===== */
         .autosave-indicator {
@@ -1639,7 +1622,7 @@
 <body>
 <div id="intro-overlay">
     <div class="intro-title">EVALUACIÓN CRITERIAL<br>MULTIMATERIA</div>
-    <div class="intro-subtitle">by @angelmicelti · v2.2</div>
+    <div class="intro-subtitle">by @angelmicelti · v2.3</div>
 </div>
 
 <div class="container-custom">
@@ -1655,6 +1638,7 @@
             <button class="fb-account-btn" id="btnFbAccount" title="Iniciar sesión"><i class="bi bi-box-arrow-in-right"></i> <span id="fbAccountLabel">Entrar</span></button>
             <button class="fb-account-btn logged-in" id="btnFbUserInfo" title="Mi cuenta" style="display:none;"></button>
             <button class="btn btn-outline-secondary btn-sm" id="btnFbGroups" title="Cursos y grupos de alumnado" style="display:none;"><i class="bi bi-mortarboard-fill"></i></button>
+            <span id="fbHeaderCourseBadge" class="badge bg-dark-subtle text-dark border" style="display:none; font-size:0.75em; cursor:help;"></span>
         </div>
         <input type="file" id="importSubjectFile" accept=".json" class="d-none">
     </div>
@@ -1668,7 +1652,7 @@
         <button type="button" class="btn btn-outline-secondary" id="btnAppInstrumentos"><i class="bi bi-grid-3x3-gap-fill"></i> Actividad por Instrumentos</button>
         <button type="button" class="btn btn-outline-info" id="btnAppPonderacion"><i class="bi bi-layers-half"></i> Ponderación</button>
         <button type="button" class="btn btn-outline-danger" id="btnAppRubricas"><i class="bi bi-grid-1x2-fill"></i> Rúbricas</button>
-        <a href="Tutorial_AppCalificaActividadesMateriaGeneral.pdf" class="btn btn-outline-danger ms-auto" id="btnTutorial" download><i class="bi bi-file-pdf"></i> Tutorial</a>
+        <a class="btn btn-outline-danger ms-auto" id="btnTutorial" href="Manual_Profesor.pdf" download="Manual_Profesor.pdf" title="Descargar el manual del perfil Profesor (PDF A4)"><i class="bi bi-person-workspace"></i> Manual</a>
     </div>
 
     <!-- Título dinámico de la pantalla actual (bajo la navbar) + botones de navegación de la app -->
@@ -1725,93 +1709,6 @@
             <div class="col-md-6"><div class="card home-card p-4 text-center h-100 d-flex flex-column" id="cardRubricas"><i class="bi bi-grid-1x2-fill" style="font-size: 3rem; color: #f5576c;"></i><h3 class="mt-3 fw-bold">Evaluación de rúbricas</h3><p class="text-muted flex-grow-1">Evalúa con rúbricas combinando valoración del profesor y coevaluación entre compañeros.</p><button class="btn btn-danger mt-auto"><i class="bi bi-box-arrow-in-right"></i> Usar</button></div></div>
         </div>
     </div>
-        <!-- ACORDEÓN: ACTIVIDADES EN LA NUBE (replegado por defecto en sub-apps) -->
-        <div class="row g-4 justify-content-center mt-2">
-            <div class="col-md-12">
-                <div class="card p-3" style="border: 2px solid #ffc107; background: linear-gradient(135deg, #fff8e1, #ffffff);">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center" style="gap:10px;">
-                        <button class="btn btn-link text-decoration-none p-0 d-flex align-items-center gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#fbCloudPanelCollapse" aria-expanded="true" aria-controls="fbCloudPanelCollapse" id="fbCloudPanelToggle" style="color:#5d4037;">
-                            <i class="bi bi-chevron-down" id="fbCloudPanelChevron" style="color:#ff9800; transition: transform 0.2s;"></i>
-                            <h3 class="fw-bold mb-0 d-flex align-items-center" style="font-size:clamp(0.95rem,3vw,1.4rem); color:#5d4037;">
-                                <i class="bi bi-cloud-arrow-up-fill me-1" style="color:#ff9800;"></i>
-                                <span id="fbCloudPanelTitle">Actividades en la nube</span>
-                                <span id="fbCloudSyncIndicator" class="fb-sync-indicator"><span class="pulse-dot"></span> Conectando…</span>
-                            </h3>
-                        </button>
-                        <button class="btn btn-outline-secondary btn-sm" id="fbCloudRefreshBtn"><i class="bi bi-arrow-clockwise"></i> Actualizar</button>
-                    </div>
-                    <div class="collapse show" id="fbCloudPanelCollapse">
-                    <div class="pt-3">
-                    <div id="fbCloudNotLoggedIn" class="text-center py-4">
-                        <i class="bi bi-lock-fill" style="font-size:3rem; color:#ffc107;"></i>
-                        <h5 class="mt-2 mb-2">Inicia sesión para acceder</h5>
-                        <p class="text-muted mb-1">Para guardar y recuperar actividades en la nube necesitas una cuenta de usuario.</p>
-                        <p class="small text-muted mb-3"><i class="bi bi-shield-fill-check"></i> Accede con tu <b>usuario IdEA</b>. La contraseña inicial es tu propio usuario IdEA (podrás cambiarla al entrar).</p>
-                        <button class="btn btn-warning btn-lg" id="fbCloudLoginBtn"><i class="bi bi-box-arrow-in-right"></i> Iniciar sesión</button>
-                    </div>
-                    <div id="fbCloudContent" style="display:none;">
-                        <div class="accordion" id="fbCloudAccordion">
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="fbCloudHeadingList">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fbCloudCollapseList" aria-expanded="false" aria-controls="fbCloudCollapseList">
-                                        <i class="bi bi-cloud-arrow-down me-2" style="color:#ff9800;"></i>
-                                        <span class="fw-bold" id="fbCloudListTitle">Actividades guardadas</span>
-                                        <span id="fbCloudCountBadge" class="badge bg-warning text-dark ms-2 fs-6">0</span>
-                                    </button>
-                                </h2>
-                                <div id="fbCloudCollapseList" class="accordion-collapse collapse" aria-labelledby="fbCloudHeadingList" data-bs-parent="#fbCloudAccordion">
-                                    <div class="accordion-body p-3">
-                                        <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
-                                            <!-- Filtro de visibilidad (solo admin): Propias / Todas -->
-                                            <div class="btn-group btn-group-sm" id="fbCloudOwnerFilter" role="group" style="display:none;">
-                                                <button type="button" class="btn btn-outline-warning active" id="fbCloudFilterMine" data-filter="mine"><i class="bi bi-person-fill"></i> Actividades propias</button>
-                                                <button type="button" class="btn btn-outline-warning" id="fbCloudFilterAll" data-filter="all"><i class="bi bi-people-fill"></i> Todas las actividades</button>
-                                            </div>
-                                            <input type="text" id="fbCloudSearch" class="form-control form-control-sm" placeholder="Buscar por nombre o app..." style="max-width:260px;">
-                                            <select id="fbCloudFilterApp" class="form-select form-select-sm" style="max-width:180px;">
-                                                <option value="">Todas las apps</option>
-                                                <option value="exam">Examen por preguntas</option>
-                                                <option value="test">Examen tipo test</option>
-                                                <option value="generic">Actividad por criterios</option>
-                                                <option value="instrumentos">Actividad por instrumentos</option>
-                                                <option value="ponderacion">Ponderación de actividades</option>
-                                                <option value="rubricas">Evaluación de rúbricas</option>
-                                            </select>
-                                            <select id="fbCloudFilterGroup" class="form-select form-select-sm" style="max-width:180px;">
-                                                <option value="">Todos los grupos</option>
-                                            </select>
-                                            <span class="text-muted small ms-auto" id="fbCloudLastUpdate"></span>
-                                        </div>
-                                        <div id="fbCloudActivitiesList"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="accordion-item" id="fbCloudSaveItem">
-                                <h2 class="accordion-header" id="fbCloudHeadingSave">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#fbCloudCollapseSave" aria-expanded="false" aria-controls="fbCloudCollapseSave">
-                                        <i class="bi bi-cloud-arrow-up me-2" style="color:#ff9800;"></i>
-                                        <span class="fw-bold" id="fbCloudSaveTitle">Guardar actividad en la nube</span>
-                                    </button>
-                                </h2>
-                                <div id="fbCloudCollapseSave" class="accordion-collapse collapse" aria-labelledby="fbCloudHeadingSave" data-bs-parent="#fbCloudAccordion">
-                                    <div class="accordion-body p-3">
-                                        <div class="alert alert-info small mb-3"><i class="bi bi-info-circle-fill"></i> Cada usuario con sesión puede guardar y gestionar sus propias actividades en la nube. El administrador ve y puede gestionar las de todos.</div>
-                                        <div class="row g-2 align-items-end">
-                                            <div class="col-md-6"><label class="form-label fw-semibold small" id="fbCloudActivityNameLabel" for="fbCloudActivityName">Nombre de la actividad</label><input type="text" id="fbCloudActivityName" class="form-control" placeholder="Ej: Examen 1ª Evaluación"></div>
-                                            <div class="col-md-4"><label class="form-label fw-semibold small" for="fbCloudSourceApp">App origen</label><select id="fbCloudSourceApp" class="form-select"><option value="exam">Examen por preguntas</option><option value="test">Examen tipo test</option><option value="generic">Actividad por criterios</option><option value="instrumentos">Actividad por instrumentos</option><option value="ponderacion">Ponderación de actividades</option><option value="rubricas">Evaluación de rúbricas</option></select></div>
-                                            <div class="col-md-2"><button class="btn btn-warning w-100" id="fbCloudSaveBtn"><i class="bi bi-cloud-arrow-up"></i> Guardar</button></div>
-                                        </div>
-                                        <div id="fbCloudSaveMessage" class="small mt-2"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    </div><!-- /.pt-3 -->
-                    </div><!-- /#fbCloudPanelCollapse -->
-                </div>
-            </div>
-        </div>
     <!-- APP 1: EXAMEN POR PREGUNTAS -->
     <div id="appExamContainer" class="screen">
         <div id="examNavButtons" style="display:none;">
@@ -2992,8 +2889,6 @@ function loadSubjectFromJSON(file) {
             renderAllBadges();
             updateExamConfigWarning(); updateTestConfigWarning(); updateGenericConfigWarning(); inst_updateConfigButtonState();
             updateSubjectDisplay();
-            // Re-renderizar el panel cloud para aplicar el filtro de materia
-            if (typeof fb_renderActivities === 'function') fb_renderActivities();
             // Comprobar si la materia ya existe en la nube y advertir al usuario
             const newSubjectId = fb_getSubjectFingerprint();
             const existingSubject = fbAllSubjects.find(s => s.id === newSubjectId);
@@ -3149,29 +3044,6 @@ function readJSONFile(file, cb) {
     const reader = new FileReader();
     reader.onload = e => { try { cb(JSON.parse(e.target.result)); } catch(err) { alert('Error al importar: ' + err.message); } };
     reader.readAsText(file);
-}
-
-/** Guarda datos en localStorage y muestra confirmación. */
-function localSave(key, getData) {
-    if (!safeLSSet(key, JSON.stringify(getData()))) {
-        return alert('⚠️ No se pudo guardar localmente: el almacenamiento del navegador no está disponible en este entorno (vista previa sandbox). Usa la opción "Exportar JSON" para guardar el archivo manualmente.');
-    }
-    alert('✅ Guardado localmente.');
-}
-
-/** Carga datos de localStorage y llama a onData(parsed); muestra alerta si no hay datos o hay error. */
-function localLoad(key, onData) {
-    const saved = safeLSGet(key);
-    if (!saved) return alert('No hay datos guardados.');
-    try { onData(JSON.parse(saved)); } catch(e) { alert('Error al cargar: ' + e.message); }
-}
-
-/** Recupera calificaciones de localStorage: applyFn(data) modifica el estado, renderFn() re-renderiza. */
-function recoverScores(lsKey, applyFn, renderFn, msgId) {
-    const saved = safeLSGet(lsKey);
-    if (!saved) return alert('No hay calificaciones guardadas.');
-    try { const data = JSON.parse(saved); applyFn(data); renderFn(); showMessage(msgId, '<i class="bi bi-check-circle"></i> Calificaciones recuperadas.'); }
-    catch(e) { alert('Error: ' + e.message); }
 }
 
 /** Conecta un botón a un input[type=file] oculto. */
@@ -3953,72 +3825,6 @@ function importAppScores(file, app) {
     });
 }
 
-/** Guarda calificaciones de una app en localStorage. */
-function saveScoresLocal(app) {
-    const cfgs = {
-        exam:    { key:'exam_scores_backup',    getData:()=>({ students:examState.students.map(s=>s.fullName), questions:examState.questions.map(q=>({id:q.id,maxScore:q.maxScore})), scores:examState.scores }),                                                                          msgId:'examGradeMessage' },
-        test:    { key:'test_scores_backup',    getData:()=>({ students:testState.students.map(s=>s.fullName), totalQuestions:testState.totalQuestions, studentScores:testState.studentScores.map(ss=>({correct:ss.correct,wrong:ss.wrong,unanswered:ss.unanswered})) }),                 msgId:'testGradeMessage' },
-        generic: { key:'generic_scores_backup', getData:()=>({ students:genericState.students.map(s=>s.fullName), criteria:genericState.globalCriteria, scores:genericState.scores }),                                                                                                    msgId:'genericGradeMessage' }
-    }[app];
-    // Bug fix: usar safeLSSet para manejar QuotaExceededError y entornos sin
-    // localStorage (sandbox, modo privado). Antes, localStorage.setItem
-    // directo podía lanzar una excepción no capturada.
-    if (!safeLSSet(cfgs.key, JSON.stringify(cfgs.getData()))) {
-        alert('⚠️ No se pudo guardar localmente: el almacenamiento del navegador no está disponible o está lleno.');
-        return;
-    }
-    showMessage(cfgs.msgId, '<i class="bi bi-check-circle"></i> Calificaciones guardadas localmente.');
-}
-
-/** Guarda toda la configuración de una app en localStorage. */
-function saveAppToLocal(app) {
-    const keys = { exam:'multimateria_exam_app', test:'multimateria_test_app', generic:'multimateria_generic_app' };
-    // Bug fix: usar safeLSSet por las mismas razones que saveScoresLocal.
-    if (!safeLSSet(keys[app], JSON.stringify(appStates[app]))) {
-        alert('⚠️ No se pudo guardar localmente: el almacenamiento del navegador no está disponible o está lleno.');
-        return;
-    }
-    alert('✅ Configuración guardada.');
-}
-
-/** Carga toda la configuración de una app desde localStorage y refresca la UI. */
-function loadAppFromLocal(app) {
-    const keys = { exam:'multimateria_exam_app', test:'multimateria_test_app', generic:'multimateria_generic_app' };
-    localLoad(keys[app], saved => {
-        if (app === 'exam') {
-            Object.assign(examState, saved);
-            examState.students = examState.students.map(s=>({...s, id:s.id||uuid()}));
-            if (!examState.criteriaDescriptions) examState.criteriaDescriptions = {};
-            normalizeExamScores(); renderGlobalBadges('exam'); renderExamQuestionsTable(); renderExamStudentTags();
-            document.getElementById('examNameInput').value = examState.examName;
-            document.getElementById('examCourseInput').value = examState.course;
-            document.getElementById('examInputNumQuestions').value = examState.questions.length;
-            validateExamCriteria(); updateExamConfigWarning();
-        } else if (app === 'test') {
-            Object.assign(testState, saved);
-            testState.students = testState.students.map(s=>({...s, id:s.id||uuid()}));
-            if (!testState.criteriaDescriptions) testState.criteriaDescriptions = {};
-            if (!testState.studentScores) testState.studentScores = testState.students.map(()=>({correct:0,wrong:0,unanswered:testState.totalQuestions}));
-            sortStudents(testState,'studentScores'); renderGlobalBadges('test'); renderTestStudentTags();
-            document.getElementById('testExamTitleInput').value = testState.examName;
-            document.getElementById('testCourseInput').value = testState.course;
-            document.getElementById('testTotalQuestions').value = testState.totalQuestions;
-            document.querySelectorAll('input[name="penalty"]').forEach(r=>{ if(parseFloat(r.value)===testState.penaltyFactor) r.checked=true; });
-            document.querySelectorAll('.penalty-option').forEach(o=>o.classList.toggle('selected',o.querySelector('input')?.checked));
-            updateTestConfigWarning();
-        } else {
-            Object.assign(genericState, saved);
-            genericState.students = genericState.students.map(s=>({...s, id:s.id||uuid()}));
-            if (!genericState.criteriaDescriptions) genericState.criteriaDescriptions = {};
-            normalizeGenericScores(); renderGlobalBadges('generic'); renderGenericStudentTags();
-            document.getElementById('genericExamNameInput').value = genericState.examName;
-            document.getElementById('genericCourseInput').value = genericState.course;
-            updateGenericConfigWarning();
-        }
-        alert('✅ Configuración cargada.');
-    });
-}
-
 /** Limpia las calificaciones de TODAS las apps (sin tocar la configuración).
  *  Se llama al cargar una actividad nueva, una materia nueva, o un nuevo usuario,
  *  para que no queden calificaciones obsoletas de la actividad anterior. */
@@ -4595,15 +4401,6 @@ function buildMissingConfigAlert(screen, missing) {
     return '⚠️ No se puede pasar a ' + screen + '.\n\nFalta completar:\n• ' + missing.join('\n• ') + '\n\nHazlo en la pantalla de Configuración.';
 }
 
-// Devuelve un array de strings con los elementos que faltan para considerar la configuración completa.
-function inst_getMissingConfig() {
-    const missing = [];
-    if (!instrumentState.actividad.trim()) missing.push('el nombre de la actividad');
-    if (!instrumentState.clase.trim()) missing.push('el curso');
-    if (!instrumentState.students.length) missing.push('al menos un alumno');
-    if (!instrumentState.instruments.length) missing.push('al menos un instrumento');
-    return missing;
-}
 function inst_updateConfigButtonState() {
     const warn = document.getElementById('inst_pesosWarning');
     const cfgWarn = document.getElementById('inst_configWarning');
@@ -4968,9 +4765,6 @@ function inst_applyConfig(data) {
 }
 function inst_importConfig(file) { readJSONFile(file, data => { inst_applyConfig(data); alert('✅ Configuración importada.'); }); }
 
-// --- Guardar / cargar config local ---
-function inst_saveConfigLocal() { localSave('inst_config_backup', ()=>({actividad:instrumentState.actividad,clase:instrumentState.clase,students:instrumentState.students.map(s=>s.fullName),instruments:instrumentState.instruments.map(i=>({name:i.name,weight:i.weight,description:i.description||''})),criteriaDescriptions:{...(instrumentState.criteriaDescriptions||{})}})); }
-function inst_loadConfigLocal() { localLoad('inst_config_backup', data=>{ inst_applyConfig(data); alert('✅ Configuración cargada.'); }); }
 
 // --- Exportar / importar / guardar / cargar matriz ---
 function inst_exportMatrix() {
@@ -4982,8 +4776,6 @@ function inst_importMatrix(file) {
         instrumentState.matrix=data.matrix; inst_renderMatrix(); inst_updateIrEvalButton(); alert('✅ Matriz importada.');
     });
 }
-function inst_saveMatrixLocal() { localSave('inst_matrix_backup', ()=>({matrix:instrumentState.matrix})); }
-function inst_loadMatrixLocal() { localLoad('inst_matrix_backup', data=>{ instrumentState.matrix=data.matrix; inst_renderMatrix(); inst_updateIrEvalButton(); alert('✅ Matriz cargada.'); }); }
 
 // --- Exportar / importar / guardar / cargar calificaciones ---
 function inst_exportEvalJson() {
@@ -5024,39 +4816,6 @@ function inst_importEvalJson(file) {
         data.instruments.forEach((inst,i)=>{ if(instrumentState.instruments[i]){ instrumentState.instruments[i].weight=inst.weight; if(inst.description!==undefined) instrumentState.instruments[i].description=inst.description; } });
         inst_recalcLastWeight(); inst_renderInstrumentsTable(); inst_renderMatrix(); inst_renderEvaluation(); inst_updateConfigButtonState();
         alert('✅ Calificaciones importadas.');
-    });
-}
-function inst_saveEvalLocal() {
-    localSave('inst_eval_backup', ()=>({students:instrumentState.students.map(s=>s.fullName),instruments:instrumentState.instruments.map(i=>({name:i.name,weight:i.weight,description:i.description||''})),evalScores:instrumentState.evalScores,evalWeights:instrumentState.evalWeights,matrix:instrumentState.matrix,criteriaDescriptions:{...(instrumentState.criteriaDescriptions||{})}}));
-}
-function inst_loadEvalLocal() {
-    localLoad('inst_eval_backup', data=>{
-        if((data.students.length!==instrumentState.students.length||data.instruments.length!==instrumentState.instruments.length)&&!confirm('Dimensiones no coinciden. ¿Cargar de todos modos?')) return;
-        // Bug fix: normalizar evalScores y matrix a las dimensiones actuales.
-        const nInst = instrumentState.instruments.length;
-        const nStud = instrumentState.students.length;
-        instrumentState.evalScores = (Array.isArray(data.evalScores) ? data.evalScores : []).slice(0, nStud).map(row => {
-            const r = Array.isArray(row) ? row : [];
-            const out = [];
-            for (let j = 0; j < nInst; j++) out.push(j < r.length ? r[j] : 0);
-            return out;
-        });
-        while (instrumentState.evalScores.length < nStud) instrumentState.evalScores.push(new Array(nInst).fill(0));
-        instrumentState.evalWeights=data.evalWeights||instrumentState.instruments.map(i=>i.weight);
-        if (Array.isArray(data.matrix)) {
-            const nC = instrumentCriteria.length;
-            instrumentState.matrix = data.matrix.slice(0, nInst).map(row => {
-                const r = Array.isArray(row) ? row : [];
-                const out = [];
-                for (let j = 0; j < nC; j++) out.push(j < r.length ? !!r[j] : false);
-                return out;
-            });
-            while (instrumentState.matrix.length < nInst) instrumentState.matrix.push(new Array(nC).fill(false));
-        }
-        if (data.criteriaDescriptions) instrumentState.criteriaDescriptions = data.criteriaDescriptions;
-        data.instruments.forEach((inst,i)=>{if(instrumentState.instruments[i]){ instrumentState.instruments[i].weight=inst.weight; if(inst.description!==undefined) instrumentState.instruments[i].description=inst.description; }});
-        inst_recalcLastWeight(); inst_renderInstrumentsTable(); inst_renderMatrix(); inst_renderEvaluation(); inst_updateConfigButtonState();
-        alert('✅ Calificaciones cargadas.');
     });
 }
 
@@ -5588,37 +5347,6 @@ function pond_importConfig(file) {
         alert('✅ Configuración importada correctamente.');
     });
 }
-function pond_saveConfigLocal() {
-    const configData = {
-        _type: 'pond_config',
-        nombre: ponderacionState.nombre,
-        curso: ponderacionState.curso,
-        numActividades: ponderacionState.numActividades
-    };
-    // Bug fix: usar safeLSSet para manejar QuotaExceededError.
-    if (!safeLSSet('pond_config_backup', JSON.stringify(configData))) {
-        alert('⚠️ No se pudo guardar localmente: almacenamiento no disponible o lleno.');
-        return;
-    }
-    alert('✅ Configuración guardada en almacenamiento local.');
-}
-function pond_loadConfigLocal() {
-    try {
-        const raw = safeLSGet('pond_config_backup');
-        if (!raw) { alert('No hay configuración guardada localmente.'); return; }
-        const data = JSON.parse(raw);
-        ponderacionState.nombre = data.nombre || '';
-        ponderacionState.curso  = data.curso  || '';
-        ponderacionState.numActividades = data.numActividades || 2;
-        const ni = document.getElementById('pond_nombreInput');
-        const ci = document.getElementById('pond_cursoInput');
-        const nai = document.getElementById('pond_numActividadesInput');
-        if (ni) ni.value = ponderacionState.nombre;
-        if (ci) ci.value = ponderacionState.curso;
-        if (nai) nai.value = ponderacionState.numActividades;
-        alert('✅ Configuración cargada desde almacenamiento local.');
-    } catch(e) { alert('Error al cargar: ' + e.message); }
-}
 
 // ── PONDERACIÓN: Import session save/load ──────────────────────────────────
 function pond_getLoadedCount() {
@@ -5661,50 +5389,6 @@ function pond_importSession(file) {
         alert(`✅ Sesión importada: ${data.loadedCount || '?'} de ${data.numActividades || '?'} actividades cargadas.`);
     });
 }
-function pond_saveSessionLocal() {
-    const loadedCount = pond_getLoadedCount();
-    const total = ponderacionState.numActividades;
-    const sessionData = {
-        _type: 'pond_session',
-        nombre: ponderacionState.nombre,
-        curso: ponderacionState.curso,
-        numActividades: ponderacionState.numActividades,
-        loadedCount: loadedCount,
-        actividades: ponderacionState.actividades.map(a => ({
-            nombre: a.nombre,
-            peso: a.peso,
-            loaded: a.loaded,
-            fileName: a.fileName || '',
-            resultados: a.resultados || []
-        }))
-    };
-    // Bug fix: usar safeLSSet para manejar QuotaExceededError.
-    if (!safeLSSet('pond_import_backup', JSON.stringify(sessionData))) {
-        alert('⚠️ No se pudo guardar localmente: almacenamiento no disponible o lleno.');
-        return;
-    }
-    alert(`✅ Sesión guardada localmente (${loadedCount} de ${total} actividades cargadas).`);
-}
-function pond_loadSessionLocal() {
-    try {
-        const raw = safeLSGet('pond_import_backup');
-        if (!raw) { alert('No hay sesión guardada localmente.'); return; }
-        const data = JSON.parse(raw);
-        if (!data || data._type !== 'pond_session') { alert('Los datos guardados no son una sesión válida.'); return; }
-        ponderacionState.nombre = data.nombre || '';
-        ponderacionState.curso  = data.curso  || '';
-        ponderacionState.numActividades = data.numActividades || 2;
-        ponderacionState.actividades = (data.actividades || []).map((a, i) => ({
-            nombre: a.nombre || `Actividad ${i+1}`,
-            peso: parseFloat(a.peso) || 0,
-            loaded: a.loaded || false,
-            fileName: a.fileName || '',
-            resultados: a.resultados || []
-        }));
-        pond_renderImportCards();
-        alert(`✅ Sesión cargada desde local (${data.loadedCount || '?'} de ${data.numActividades || '?'} actividades).`);
-    } catch(e) { alert('Error al cargar: ' + e.message); }
-}
 
 function pond_showScreen(screen) {
     ['pond_screenConfig','pond_screenImport','pond_screenResults'].forEach(id => {
@@ -5729,21 +5413,6 @@ function pond_showScreen(screen) {
     if (screen === 'Results') pond_renderResults();
     // Sincronizar el estado 'active' en los clones de la barra inferior
     if (typeof _bottomNav_syncActive === 'function') _bottomNav_syncActive();
-}
-
-function pond_validateConfig() {
-    const warn = document.getElementById('pond_configWarning');
-    if (!warn) return true;
-    const missing = [];
-    if (!ponderacionState.nombre.trim()) missing.push('<strong>el nombre</strong>');
-    if (!ponderacionState.curso.trim()) missing.push('<strong>el curso</strong>');
-    if (missing.length) {
-        warn.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Completa: ' + missing.join(', ');
-        warn.style.display = 'block';
-        return false;
-    }
-    warn.style.display = 'none';
-    return true;
 }
 
 // =============================================================================
@@ -6239,21 +5908,6 @@ function rubric_showScreen(screen) {
 }
 
 // === Persistencia ===
-function rubric_serialize() {
-    return {
-        evalName: rubricState.evalName,
-        groupName: rubricState.groupName,
-        students: rubricState.students.map(s => ({id: s.id, fullName: s.fullName})),
-        aspects: [...rubricState.aspects],
-        values: [...rubricState.values],
-        teacherWeight: rubricState.teacherWeight,
-        teacher: rubricState.teacher,
-        coevaluation: rubricState.coevaluation,
-        results: rubricState.results,
-        globalCriteria: [...rubricState.globalCriteria],
-        criteriaDescriptions: {...rubricState.criteriaDescriptions}
-    };
-}
 function rubric_loadFromObj(data) {
     if (!data || typeof data !== 'object') throw new Error('Datos inválidos');
     // Bug fix: usar cadena vacía en vez de 'Exposición' como fallback.
@@ -6585,8 +6239,6 @@ function pond_resetAll() {
     if (na) na.value = 2;
     const warn = document.getElementById('pond_configWarning');
     if (warn) warn.style.display = 'none';
-    safeLSRemove('pond_config_backup');
-    safeLSRemove('pond_import_backup');
     updateActivityBadge(currentApp);
     alert('\u2705 Datos de ponderaci\u00f3n reiniciados.');
 }
@@ -6636,23 +6288,23 @@ function pond_saveSessionToCloud() {
         createdByName: fbCurrentUser.displayName || '',
         version: 1
     };
-    // Buscar si ya existe una sesión de ponderación para este usuario y materia
+    // Buscar si ya existe una sesión de ponderación para este usuario, materia y curso activo
     const existing = fbAllActivities.find(a =>
         a.kind === 'pond_session' &&
         a.app === 'ponderacion' &&
         a.createdBy === fbCurrentUser.uid &&
-        (a.subjectId || '') === (fb_getSubjectFingerprint() || '')
+        (a.subjectId || '') === (fb_getSubjectFingerprint() || '') &&
+        fb_recordInActiveCourse(a)
     );
-    fb_setSyncState('syncing', 'Guardando sesión en la nube…');
     if (existing) {
         fbDb.ref(`${FB_ACTIVITIES_PATH}/${existing.id}`).update(record)
-            .then(() => { fb_setSyncState('synced', 'Sincronizado'); alert(`✅ Sesión actualizada en la nube (${loadedCount} actividades cargadas).`); })
-            .catch(err => { fb_setSyncState('error', 'Error'); alert('Error: ' + err.message); });
+            .then(() => { alert(`✅ Sesión actualizada en la nube (${loadedCount} actividades cargadas).`); })
+            .catch(err => { alert('Error: ' + err.message); });
     } else {
         record.createdAt = now;
         fbDb.ref(FB_ACTIVITIES_PATH).push(record)
-            .then(() => { fb_setSyncState('synced', 'Sincronizado'); alert(`✅ Sesión guardada en la nube (${loadedCount} actividades cargadas).`); })
-            .catch(err => { fb_setSyncState('error', 'Error'); alert('Error: ' + err.message); });
+            .then(() => { alert(`✅ Sesión guardada en la nube (${loadedCount} actividades cargadas).`); })
+            .catch(err => { alert('Error: ' + err.message); });
     }
 }
 
@@ -6664,12 +6316,13 @@ function pond_loadSessionFromCloud() {
         if (authModal) bootstrap.Modal.getOrCreateInstance(authModal).show();
         return;
     }
-    // Buscar sesiones de ponderación del usuario actual y materia actual
+    // Buscar sesiones de ponderación del usuario actual, materia y curso activo
     const sessions = fbAllActivities.filter(a =>
         a.kind === 'pond_session' &&
         a.app === 'ponderacion' &&
         a.createdBy === fbCurrentUser.uid &&
-        (a.subjectId || '') === (fb_getSubjectFingerprint() || '')
+        (a.subjectId || '') === (fb_getSubjectFingerprint() || '') &&
+        fb_recordInActiveCourse(a)
     );
     if (sessions.length === 0) {
         alert('No hay sesiones de ponderación guardadas en la nube para esta materia.');
@@ -6721,7 +6374,6 @@ let currentApp = 'home';
 // Flags para controlar que se haya visitado la pantalla intermedia (Calificación/Evaluación)
 // antes de permitir el paso a Resultados. Cada subapp tiene su flag.
 let _visitedGradeScreen = { exam: false, test: false, generic: false, instrumentos: false, ponderacion: false, rubricas: false };
-let _cloudOwnerFilter = 'mine'; // 'mine' (solo propias) o 'all' (todas) — solo relevante para admin
 
 function hideAllApps() {
     ['homeScreen','appExamContainer','appTestContainer','appGenericContainer','appInstrumentosContainer','appPonderacionContainer','appRubricasContainer'].forEach(id => document.getElementById(id).classList.remove('active'));
@@ -6785,12 +6437,6 @@ function updateActivityBadge(app) {
         rubricas: 'bg-danger'
     };
     badge.className = 'badge ms-2 fs-6 ' + (colorMap[app] || 'bg-secondary');
-    // Sincronizar el campo de nombre del formulario cloud con el nombre actual
-    // (en sub-apps el campo debe reflejar siempre el nombre de la actividad)
-    const nameInput = document.getElementById('fbCloudActivityName');
-    if (nameInput && app === currentApp) {
-        nameInput.value = name;
-    }
 }
 
 function updateScreenTitle(app) {
@@ -6916,7 +6562,7 @@ function _bottomNav_syncActive() {
     });
 }
 
-function showHome() { hideAllApps(); document.getElementById('homeScreen').classList.add('active'); currentApp='home'; setBodyColor('home'); updateScreenTitle('home'); if (typeof fb_renderActivities === 'function') fb_renderActivities(); }
+function showHome() { hideAllApps(); document.getElementById('homeScreen').classList.add('active'); currentApp='home'; setBodyColor('home'); updateScreenTitle('home'); }
 
 function showApp(appId) {
     if (!subjectInfo.criteriaCodes.length) {
@@ -6932,14 +6578,6 @@ function showApp(appId) {
     if (appId === 'appInstrumentosContainer') showInstrumentosScreen('inst_config');
     if (appId === 'appPonderacionContainer') pond_showScreen('Config');
     if (appId === 'appRubricasContainer') rubric_showScreen('Setup');
-    // Al entrar a una sub-app: replegar el panel cloud (el usuario lo expande manualmente)
-    const panelCollapse = document.getElementById('fbCloudPanelCollapse');
-    if (panelCollapse) {
-        const bsCollapse = bootstrap.Collapse.getOrCreateInstance(panelCollapse, { toggle: false });
-        bsCollapse.hide();
-    }
-    // Re-renderizar el panel de actividades en la nube para aplicar el filtro por tipo
-    if (typeof fb_renderActivities === 'function') fb_renderActivities();
 }
 
 function showAppScreen(prefix, screen) {
@@ -7068,17 +6706,7 @@ function fb_init() {
         fbAuth.onAuthStateChanged(fb_onAuthStateChanged);
     } catch(e) {
         console.error('Error inicializando Firebase:', e);
-        fb_setSyncState('error', 'Error de conexión');
-    }
-}
-
-// Estado del indicador de sincronización
-function fb_setSyncState(state, text) {
-    const el = document.getElementById('fbCloudSyncIndicator');
-    if (!el) return;
-    el.className = 'fb-sync-indicator ' + state;
-    const labels = { synced: 'Sincronizado', syncing: 'Sincronizando…', error: 'Sin conexión' };
-    el.innerHTML = `<span class="pulse-dot"></span> ${text || labels[state] || state}`;
+        }
 }
 
 // Mapa nombre interno → nombre visible de las apps
@@ -7324,7 +6952,6 @@ function fb_login(username, password) {
         return;
     }
     const email = fb_usernameToEmail(username);
-    fb_setSyncState('syncing', 'Verificando credenciales…');
     fbAuth.signInWithEmailAndPassword(email, password)
         .then(() => {
             fb_showAuthMessage('', '');
@@ -7332,7 +6959,6 @@ function fb_login(username, password) {
             bootstrap.Modal.getOrCreateInstance(modalEl).hide();
         })
         .catch(err => {
-            fb_setSyncState('error', 'Credenciales inválidas');
             let msg = 'Error al iniciar sesión.';
             if (err.code === 'auth/user-not-found') msg = 'No existe ningún usuario con ese nombre.';
             else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'Usuario o contraseña incorrectos.';
@@ -7352,7 +6978,6 @@ function fb_register(displayName, username, password, passwordConfirm) {
     if (password.length < 6) { fb_showAuthMessage('La contraseña debe tener al menos 6 caracteres.', 'danger'); return; }
     if (password !== passwordConfirm) { fb_showAuthMessage('Las contraseñas no coinciden.', 'danger'); return; }
     const email = fb_usernameToEmail(username);
-    fb_setSyncState('syncing', 'Creando cuenta…');
     fbAuth.createUserWithEmailAndPassword(email, password)
         .then(cred => {
             // Crear registro en DB con rol 'user' (no admin)
@@ -7377,7 +7002,6 @@ function fb_register(displayName, username, password, passwordConfirm) {
             bootstrap.Modal.getOrCreateInstance(modalEl).hide();
         })
         .catch(err => {
-            fb_setSyncState('error', 'No se pudo registrar');
             let msg = 'Error al crear la cuenta.';
             if (err.code === 'auth/email-already-in-use') msg = 'Ya existe una cuenta con ese nombre de usuario. Elige otro.';
             else if (err.code === 'auth/invalid-email') msg = 'Nombre de usuario no válido.';
@@ -7484,8 +7108,31 @@ function fb_showAuthMessage(text, type) {
     el.innerHTML = `<div class="alert ${cls} small py-2 px-3 mb-0"><i class="bi ${type==='success'?'bi-check-circle':(type==='danger'?'bi-exclamation-triangle':'bi-info-circle')}"></i> ${escapeHtml(text)}</div>`;
 }
 
+// === UI: manual por perfil (descarga directa, sin modal) ===
+// Cada perfil descarga directamente su propio manual: Administración → Manual_Administracion.pdf;
+// Profesor (o sin sesión iniciada, valor por defecto) → Manual_Profesor.pdf.
+// Ambos PDF se publican junto a index.html.
+function fb_updateManualLink() {
+    const a = document.getElementById('btnTutorial');
+    if (!a) return;
+    const isAdmin = !!(fbCurrentUser && fbCurrentUser.role === 'admin');
+    const file = isAdmin ? 'Manual_Administracion.pdf' : 'Manual_Profesor.pdf';
+    a.href = file;
+    a.setAttribute('download', file);
+    if (isAdmin) {
+        a.title = 'Descargar el manual del perfil Administración (PDF A4)';
+        a.innerHTML = '<i class="bi bi-shield-lock"></i> Manual Administración';
+    } else {
+        a.title = fbCurrentUser
+            ? 'Descargar el manual del perfil Profesor (PDF A4)'
+            : 'Descargar el manual del perfil Profesor (PDF A4). Inicia sesión como Administración para descargar su manual.';
+        a.innerHTML = '<i class="bi bi-person-workspace"></i> Manual' + (fbCurrentUser ? ' Profesor' : '');
+    }
+}
+
 // === UI: botón de cuenta ===
 function fb_updateAccountUI() {
+    fb_updateManualLink();
     const btn = document.getElementById('btnFbAccount');
     const userInfoBtn = document.getElementById('btnFbUserInfo');
     const groupsBtn = document.getElementById('btnFbGroups');
@@ -7515,19 +7162,23 @@ function fb_updateAccountUI() {
     if (groupsBtn) groupsBtn.style.display = '';
 }
 
-// === UI: panel de cuenta ===
+// === UI: modal de cuenta (fbAuthModal alterna entre formulario de acceso y panel de cuenta) ===
 function fb_updateCloudUI() {
-    const notLoggedIn = document.getElementById('fbCloudNotLoggedIn');
-    const content = document.getElementById('fbCloudContent');
-    if (!notLoggedIn || !content) return;
-    if (!fbCurrentUser) {
-        notLoggedIn.style.display = 'block';
-        content.style.display = 'none';
-        fb_setSyncState('error', 'Sin sesión');
+    const authForm = document.getElementById('fbAuthForm');
+    const authTabs = document.getElementById('fbAuthTabs');
+    const accountPanel = document.getElementById('fbAccountPanel');
+    if (fbCurrentUser) {
+        // Con sesión: ocultar el formulario de acceso y mostrar el panel de cuenta
+        if (authForm) authForm.style.display = 'none';
+        if (authTabs) authTabs.style.display = 'none';
+        if (accountPanel) accountPanel.style.display = 'block';
+    } else {
+        // Sin sesión: mostrar el formulario de acceso y ocultar el panel de cuenta
+        if (authForm) authForm.style.display = '';
+        if (authTabs) authTabs.style.display = '';
+        if (accountPanel) accountPanel.style.display = 'none';
         return;
     }
-    notLoggedIn.style.display = 'none';
-    content.style.display = 'block';
     // Actualizar panel de cuenta (avatar, nombre, email, rol)
     const initial = (fbCurrentUser.displayName || fbCurrentUser.email || 'U').charAt(0).toUpperCase();
     const avatar = document.getElementById('fbAccountPanelAvatar');
@@ -7543,19 +7194,11 @@ function fb_updateCloudUI() {
     // Mostrar/ocultar botón de gestión de usuarios (solo admin)
     const manageUsersBtn = document.getElementById('fbAccountManageUsersBtn');
     if (manageUsersBtn) manageUsersBtn.style.display = fbCurrentUser.role === 'admin' ? '' : 'none';
-    // Botón de guardar: disponible para todos los usuarios con sesión
-    const saveBtn = document.getElementById('fbCloudSaveBtn');
-    if (saveBtn) {
-        saveBtn.disabled = false;
-        saveBtn.title = '';
     }
-    fb_setSyncState('synced', 'Conectado');
-}
 
 // === SUSCRIPCIÓN EN TIEMPO REAL A ACTIVIDADES ===
 function fb_subscribeActivities() {
     if (fbActivitiesUnsub) fbActivitiesUnsub();
-    fb_setSyncState('syncing', 'Cargando actividades…');
     const ref = fbDb.ref(FB_ACTIVITIES_PATH).orderByChild('updatedAt');
     fbActivitiesUnsub = ref.on('value', snap => {
         const data = snap.val() || {};
@@ -7566,13 +7209,13 @@ function fb_subscribeActivities() {
             .filter(a => a.appId === FB_APP_ID);
         // Ordenar por updatedAt desc (más reciente primero)
         fbAllActivities.sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0));
-        fb_renderActivities();
-        fb_setSyncState('synced', 'Sincronizado');
-        const lastUpdate = document.getElementById('fbCloudLastUpdate');
-        if (lastUpdate) lastUpdate.textContent = 'Última actualización: ' + new Date().toLocaleTimeString('es-ES');
+        // Si el modal de carga está abierto, refrescar la lista (los datos han cambiado)
+        const loadModalOpen = document.getElementById('fbAppLoadModal');
+        if (loadModalOpen && loadModalOpen.classList.contains('show')) {
+            try { fb_renderAppLoadList(); } catch (e) {}
+        }
     }, err => {
         console.warn('Error suscripción actividades:', err);
-        fb_setSyncState('error', 'Error al cargar');
     });
 }
 
@@ -7652,6 +7295,37 @@ function fb_getEffectiveCurrentCourseId() {
     return lastActive ? lastActive.id : (fbAllCourses.length ? fbAllCourses[fbAllCourses.length - 1].id : null);
 }
 
+// Devuelve el ID del curso académico que contiene un instante de tiempo dado.
+// Un curso va del 1 de septiembre de yearStart al 31 de agosto de yearEnd.
+// Se usa para atribuir a un curso los registros heredados que no tienen courseId.
+function fb_courseIdForTimestamp(ts) {
+    if (!ts) return '';
+    for (const c of fbAllCourses) {
+        const yS = parseInt(c.yearStart, 10), yE = parseInt(c.yearEnd, 10);
+        if (!yS || !yE) continue;
+        const start = new Date(yS, 8, 1).getTime();                  // 1 sep
+        const end = new Date(yE, 7, 31, 23, 59, 59, 999).getTime();  // 31 ago
+        if (ts >= start && ts <= end) return c.id;
+    }
+    return '';
+}
+
+// Resuelve el curso efectivo de un registro de actividad:
+// 1) el courseId explícito del registro; 2) para registros heredados (creados
+// antes del sistema de cursos), el curso cuya franja temporal contiene su fecha.
+function fb_resolveRecordCourseId(record) {
+    if (!record) return '';
+    if (record.courseId) return record.courseId;
+    return fb_courseIdForTimestamp(record.createdAt || record.updatedAt || 0);
+}
+
+// ¿Pertenece el registro al curso activo? (aislamiento de datos entre cursos)
+// Si no hay curso activo seleccionado no puede haber aislamiento: se ven todos.
+function fb_recordInActiveCourse(record) {
+    if (!fbCurrentCourseId) return true;
+    return fb_resolveRecordCourseId(record) === fbCurrentCourseId;
+}
+
 // Recalcula la selección local de curso. Si force=false solo actúa cuando no
 // hay selección previa; si force=true, sincroniza siempre (p. ej. cuando el
 // administrador cambia el curso global y debe aplicarse a todos).
@@ -7659,10 +7333,31 @@ function fb_recomputeCurrentCourse(force) {
     if (!force && fbCurrentCourseId) return; // ya hay selección local
     const eff = fb_getEffectiveCurrentCourseId();
     if (eff) fbCurrentCourseId = eff;
+    fb_updateHeaderCourseBadge();
     // Re-renderizar el modal de grupos si está abierto
     const groupsModal = document.getElementById('fbGroupsModal');
     if (groupsModal && groupsModal.classList.contains('show')) {
         try { fb_renderGroupsModalBody(); } catch (e) {}
+    }
+    // Re-renderizar el modal de carga si está abierto (el filtro de curso cambia)
+    const loadModal = document.getElementById('fbAppLoadModal');
+    if (loadModal && loadModal.classList.contains('show')) {
+        try { fb_renderAppLoadList(); } catch (e) {}
+    }
+}
+
+// Badge del curso activo en la cabecera (junto al botón de cursos y grupos)
+function fb_updateHeaderCourseBadge() {
+    const badge = document.getElementById('fbHeaderCourseBadge');
+    if (!badge) return;
+    const course = fbAllCourses.find(c => c.id === fbCurrentCourseId);
+    if (course) {
+        badge.style.display = '';
+        badge.textContent = course.label;
+        badge.title = 'Curso académico activo: ' + course.label + ' (los datos están aislados por curso)';
+    } else {
+        badge.style.display = 'none';
+        badge.textContent = '';
     }
 }
 
@@ -7729,11 +7424,15 @@ function fb_subscribeCourses() {
         if (!fbCurrentCourseId) {
             fb_recomputeCurrentCourse(false);
         }
-
-        // Re-renderizar el modal de grupos si está abierto
+        // Actualizar el badge de curso de la cabecera y los modales abiertos
+        fb_updateHeaderCourseBadge();
         const groupsModal = document.getElementById('fbGroupsModal');
         if (groupsModal && groupsModal.classList.contains('show')) {
             fb_renderGroupsModalBody();
+        }
+        const loadModal = document.getElementById('fbAppLoadModal');
+        if (loadModal && loadModal.classList.contains('show')) {
+            try { fb_renderAppLoadList(); } catch (e) {}
         }
     }, err => console.warn('Error suscripción cursos:', err));
 }
@@ -7814,7 +7513,6 @@ function fb_deleteCourse(course) {
 // Suscribirse a materias en tiempo real
 function fb_subscribeSubjects() {
     if (fbSubjectsUnsub) fbSubjectsUnsub();
-    fb_setSyncState('syncing', 'Cargando materias…');
     const ref = fbDb.ref(FB_SUBJECTS_PATH);
     fbSubjectsUnsub = ref.on('value', snap => {
         const data = snap.val() || {};
@@ -7824,11 +7522,9 @@ function fb_subscribeSubjects() {
         fbAllSubjects = Object.entries(data)
             .map(([id, val]) => ({ id, ...val }))
             .filter(s => !s.appId || s.appId === FB_APP_ID);
-        fb_setSyncState('synced', 'Sincronizado');
-    }, err => {
+        }, err => {
         console.warn('Error suscripción materias:', err);
-        fb_setSyncState('error', 'Error al cargar materias');
-    });
+        });
 }
 
 // Guardar la materia actual en la nube
@@ -7895,7 +7591,6 @@ function fb_loadSubjectFromCloud(subject) {
     updateExamConfigWarning(); updateTestConfigWarning(); updateGenericConfigWarning(); inst_updateConfigButtonState();
     updateSubjectDisplay();
     updateActivityBadge(currentApp);
-    if (typeof fb_renderActivities === 'function') fb_renderActivities();
     alert(`✅ Materia "${subjectInfo.name}" cargada desde la nube con ${subjectInfo.criteriaCodes.length} criterios.`);
     bootstrap.Modal.getOrCreateInstance(document.getElementById('fbSubjectsModal'))?.hide();
     // Recoger el acordeón de importación de materia a los 3 segundos
@@ -8539,323 +8234,6 @@ function fb_attachGroupsModalListeners() {
     }
 }
 
-// === ETIQUETAS CONTEXTUALES DEL PANEL CLOUD ===
-// Devuelve { listTitle, saveTitle, saveBtnLabel, noun } según currentApp
-function fb_getCloudLabels() {
-    const app = currentApp || 'home';
-    const labels = {
-        home:         { listTitle: 'Actividades guardadas',  saveTitle: 'Guardar actividad en la nube', noun: 'actividad' },
-        exam:         { listTitle: 'Exámenes guardados',     saveTitle: 'Guardar examen por preguntas en la nube', noun: 'examen' },
-        test:         { listTitle: 'Exámenes guardados',     saveTitle: 'Guardar examen tipo test en la nube', noun: 'examen' },
-        generic:      { listTitle: 'Actividades guardadas',  saveTitle: 'Guardar actividad por criterios en la nube', noun: 'actividad' },
-        instrumentos: { listTitle: 'Actividades guardadas',  saveTitle: 'Guardar actividad por instrumentos en la nube', noun: 'actividad' },
-        rubricas:     { listTitle: 'Rúbricas guardadas',     saveTitle: 'Guardar rúbrica en la nube', noun: 'rúbrica' },
-        ponderacion:  { listTitle: 'Actividades guardadas',  saveTitle: 'Guardar actividad en la nube', noun: 'actividad' }
-    };
-    return labels[app] || labels.home;
-}
-
-// Actualiza los títulos del acordeón cloud según el contexto
-function fb_updateCloudLabels() {
-    const lbl = fb_getCloudLabels();
-    const listTitleEl = document.getElementById('fbCloudListTitle');
-    const saveTitleEl = document.getElementById('fbCloudSaveTitle');
-    if (listTitleEl) listTitleEl.textContent = lbl.listTitle;
-    if (saveTitleEl) saveTitleEl.textContent = lbl.saveTitle;
-}
-
-// Contextualiza el formulario de guardado del panel cloud según la pantalla actual.
-// En sub-apps: fija el dropdown a la app actual, rellena el nombre con el de la actividad,
-// y personaliza el label/placeholder del campo nombre.
-// En Home: deja el dropdown libre y el label genérico.
-function fb_updateSaveFormContext() {
-    const isHome = (currentApp === 'home' || !currentApp);
-    const appSelect = document.getElementById('fbCloudSourceApp');
-    const nameInput = document.getElementById('fbCloudActivityName');
-    const nameLabel = document.getElementById('fbCloudActivityNameLabel');
-    if (!appSelect || !nameInput) return;
-    // Etiquetas contextuales por app: { label, placeholder }
-    const ctx = {
-        exam:         { label: 'Nombre del examen',                 placeholder: 'Ej: Examen 1ª Evaluación' },
-        test:         { label: 'Nombre del examen',                 placeholder: 'Ej: Test 1ª Evaluación' },
-        generic:      { label: 'Nombre de la actividad',            placeholder: 'Ej: Práctica 3' },
-        instrumentos: { label: 'Nombre de la actividad',            placeholder: 'Ej: Proyecto Mecanismos' },
-        rubricas:     { label: 'Nombre de la rúbrica',              placeholder: 'Ej: Exposición oral' },
-        ponderacion:  { label: 'Nombre de la ponderación',          placeholder: 'Ej: Recuperación 1ª Evaluación' }
-    };
-    if (isHome) {
-        // Home: label genérico, dropdown habilitado con todas las opciones
-        if (nameLabel) nameLabel.textContent = 'Nombre de la actividad';
-        nameInput.placeholder = 'Ej: Examen 1ª Evaluación';
-        appSelect.disabled = false;
-        // Vaciar el campo (el usuario elegirá la app y se rellenará automáticamente)
-        nameInput.value = '';
-    } else {
-        // Sub-app: fijar dropdown a la app actual y deshabilitarlo
-        appSelect.value = currentApp;
-        appSelect.disabled = true;
-        const c = ctx[currentApp] || { label: 'Nombre de la actividad', placeholder: '' };
-        if (nameLabel) nameLabel.textContent = c.label;
-        nameInput.placeholder = c.placeholder;
-        // Rellenar el nombre con el de la actividad actual (si el campo está vacío o era de otra app)
-        const currentName = getActivityName(currentApp);
-        if (currentName) {
-            nameInput.value = currentName;
-        } else {
-            nameInput.value = '';
-        }
-    }
-}
-
-// === RENDERIZADO DE ACTIVIDADES ===
-function fb_renderActivities() {
-    const list = document.getElementById('fbCloudActivitiesList');
-    const countBadge = document.getElementById('fbCloudCountBadge');
-    if (!list) return;
-    list.innerHTML = '';
-    // Actualizar títulos contextuales del acordeón y el formulario de guardado
-    fb_updateCloudLabels();
-    fb_updateSaveFormContext();
-    // Determinar el contexto: en Home se muestran todas las actividades;
-    // en cada sub-app se filtran automáticamente por el tipo de esa pantalla.
-    const isHome = (currentApp === 'home' || !currentApp);
-    // Actualizar título y estado del panel cloud según contexto
-    const panelTitleEl = document.getElementById('fbCloudPanelTitle');
-    if (panelTitleEl) {
-        const lbl = fb_getCloudLabels();
-        panelTitleEl.textContent = isHome ? 'Actividades en la nube' : (lbl.listTitle.replace(/ guardad[oa]s?$/i, ' en la nube'));
-    }
-    // Panel cloud: oculto en todas las pantallas (Home y sub-apps).
-    // La funcionalidad de carga se hace a través del botón "Cargar nube" de cada app
-    // que abre el modal fbAppLoadModal con la información enriquecida.
-    const cloudPanelWrapper = document.getElementById('fbCloudPanelCollapse');
-    if (cloudPanelWrapper) {
-        const wrapperRow = cloudPanelWrapper.closest('.row');
-        if (wrapperRow) wrapperRow.style.display = 'none';
-    }
-    // En Home: ocultar la sección "Guardar actividad en la nube" (solo listado).
-    // En sub-apps: mostrarla (el usuario guarda desde su contexto).
-    const saveItem = document.getElementById('fbCloudSaveItem');
-    if (saveItem) saveItem.style.display = isHome ? 'none' : '';
-    // En el panel solo se muestran las CONFIGURACIONES (kind === 'config')
-    // Los usuarios no-admin solo ven sus propias actividades; el admin puede elegir.
-    const isAdmin = fbCurrentUser && fbCurrentUser.role === 'admin';
-    // Mostrar/ocultar botones de filtro de propietario (solo admin)
-    const ownerFilterEl = document.getElementById('fbCloudOwnerFilter');
-    if (ownerFilterEl) ownerFilterEl.style.display = isAdmin ? 'inline-flex' : 'none';
-    // Determinar qué actividades mostrar
-    let visibleActivities;
-    if (isAdmin && _cloudOwnerFilter === 'all') {
-        // Admin viendo todas: todas las actividades de todos los usuarios
-        visibleActivities = fbAllActivities.filter(a => (a.kind || 'config') === 'config');
-    } else {
-        // Profesor, o admin con filtro "mine": solo actividades propias
-        visibleActivities = fbAllActivities.filter(a => (a.kind || 'config') === 'config' && a.createdBy === (fbCurrentUser && fbCurrentUser.uid));
-    }
-    // Filtrar por tipo de app según la pantalla actual (excepto en Home)
-    if (!isHome) {
-        visibleActivities = visibleActivities.filter(a => a.app === currentApp);
-    }
-    // Filtrar por materia: solo se muestran las actividades de la materia cargada
-    const currentSubjectId = fb_getSubjectFingerprint();
-    if (currentSubjectId) {
-        visibleActivities = visibleActivities.filter(a => (a.subjectId || '') === currentSubjectId);
-    } else {
-        // Si no hay materia cargada, no mostrar ninguna actividad
-        visibleActivities = [];
-    }
-    const configActivities = visibleActivities;
-    if (countBadge) countBadge.textContent = configActivities.length;
-    // Indicar si se están viendo todas (para mostrar badge de propietario en tarjetas)
-    const showOwnerBadge = isAdmin && _cloudOwnerFilter === 'all';
-
-    // En sub-apps, ocultar el filtro de tipo (ya está filtrado); en Home, mostrarlo
-    const filterAppWrapper = document.getElementById('fbCloudFilterApp');
-    if (filterAppWrapper) {
-        filterAppWrapper.style.display = isHome ? '' : 'none';
-        // Resetear el filtro de app si no estamos en Home (para que no interfiera)
-        if (!isHome) filterAppWrapper.value = '';
-    }
-
-    // En sub-apps, ocultar el filtro de grupos (la pantalla ya filtra por tipo);
-    // en Home, mostrarlo y poblarlo dinámicamente
-    const groupSelect = document.getElementById('fbCloudFilterGroup');
-    if (groupSelect) {
-        if (isHome) {
-            const currentGroupVal = groupSelect.value;
-            const groups = [...new Set(configActivities.map(a => a.className || '').filter(c => c))].sort((a, b) => a.localeCompare(b, 'es', { numeric: true }));
-            groupSelect.innerHTML = '<option value="">Todos los grupos</option>' +
-                groups.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(g)}</option>`).join('');
-            if (currentGroupVal && groups.includes(currentGroupVal)) {
-                groupSelect.value = currentGroupVal;
-            }
-            groupSelect.style.display = '';
-        } else {
-            groupSelect.style.display = 'none';
-            groupSelect.value = '';
-        }
-    }
-
-    // Mapa de grupo → índice de color (para asignar colores consistentes)
-    const groupColors = {};
-    let groupColorIdx = 0;
-    configActivities.forEach(a => {
-        const cn = a.className || '';
-        if (cn && !(cn in groupColors)) {
-            groupColors[cn] = groupColorIdx % 8; // 8 colores disponibles
-            groupColorIdx++;
-        }
-    });
-
-    // Aplicar filtros manuales (búsqueda y grupo; el filtro de app solo en Home)
-    const search = (document.getElementById('fbCloudSearch')?.value || '').toLowerCase().trim();
-    const filterApp = isHome ? (document.getElementById('fbCloudFilterApp')?.value || '') : '';
-    const filterGroup = document.getElementById('fbCloudFilterGroup')?.value || '';
-    const filtered = configActivities.filter(a => {
-        if (filterApp && a.app !== filterApp) return false;
-        if (filterGroup && (a.className || '') !== filterGroup) return false;
-        if (search) {
-            const hay = ((a.name || '') + ' ' + (a.appLabel || '') + ' ' + (a.createdByName || '') + ' ' + (a.className || '')).toLowerCase();
-            if (!hay.includes(search)) return false;
-        }
-        return true;
-    });
-
-    if (filtered.length === 0) {
-        let ctxMsg;
-        if (!currentSubjectId) {
-            ctxMsg = 'No hay materia cargada. Importa una materia para ver sus actividades en la nube.';
-        } else if (isHome) {
-            ctxMsg = configActivities.length === 0 ? 'Aún no hay actividades guardadas en la nube para esta materia.' : 'No se encontraron actividades con los filtros aplicados.';
-        } else {
-            ctxMsg = configActivities.length === 0 ? 'Aún no tienes actividades de este tipo en la nube para esta materia.' : 'No se encontraron actividades con los filtros aplicados.';
-        }
-        list.innerHTML = '<div class="text-center text-muted p-4"><i class="bi bi-cloud-slash" style="font-size:2.5rem;"></i><p class="mt-2 mb-0">' + ctxMsg + '</p></div>';
-        return;
-    }
-
-    filtered.forEach(a => {
-        const isOwner = a.createdBy === (fbCurrentUser && fbCurrentUser.uid);
-        const canEdit = isAdmin || isOwner; // admin o dueño pueden renombrar/eliminar
-        // Wrapper para config + sus hijos scores
-        const wrapper = document.createElement('div');
-        wrapper.style.marginBottom = '4px';
-
-        const card = document.createElement('div');
-        card.className = 'fb-activity-card';
-        const appLabel = a.appLabel || FB_APP_LABELS[a.app] || a.app || '?';
-        const updated = a.updatedAt ? new Date(a.updatedAt).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }) : '—';
-        const created = a.createdAt ? new Date(a.createdAt).toLocaleDateString('es-ES') : '—';
-        const criteriaCount = a.data?.config?.globalCriteria?.length || a.data?.globalCriteria?.length || a.data?.criteria?.length || 0;
-        const studentCount = a.data?.config?.students?.length || a.data?.students?.length || a.data?.evalName ? (a.data?.students?.length || 0) : 0;
-        const className = a.className || '';
-        const groupColorClass = className ? `group-${groupColors[className] || 0}` : '';
-        // Comprobar si hay calificaciones vinculadas (mismo configId)
-        const configId = fb_getConfigFingerprintForRecord(a);
-        const linkedScores = configId ? fbAllActivities.filter(s => s.kind === 'scores' && s.app === a.app && s.configId === configId) : [];
-        const hasScores = linkedScores.length > 0;
-        const completoBadge = hasScores
-            ? ' <span class="badge bg-success ms-1" style="font-size:0.65em;">COMPLETO</span>'
-            : '';
-        const classBadge = className ? `<span class="fb-class-badge ${groupColorClass}"><i class="bi bi-mortarboard"></i> ${escapeHtml(className)}</span>` : '';
-        const expandBtn = hasScores
-            ? `<button class="fb-expand-toggle" title="Mostrar/ocultar calificaciones vinculadas"><i class="bi bi-chevron-right"></i></button>`
-            : '<div style="width:30px; flex-shrink:0;"></div>';
-
-        card.innerHTML = `
-            ${expandBtn}
-            <div class="fb-act-icon"><i class="bi bi-${a.app === 'rubricas' ? 'grid-1x2' : (a.app === 'exam' ? 'pencil-square' : (a.app === 'test' ? 'calculator' : (a.app === 'instrumentos' ? 'grid-3x3-gap' : (a.app === 'ponderacion' ? 'layers-half' : 'check2-circle'))))}"></i></div>
-            <div class="fb-act-body">
-                <div class="fb-act-name">
-                    ${escapeHtml(a.name || 'Sin nombre')}
-                    <span class="badge bg-secondary" style="font-size:0.7em;">${escapeHtml(appLabel)}</span>
-                    ${classBadge}
-                    ${completoBadge}
-                    ${showOwnerBadge ? '<span class="badge bg-info ms-1" style="font-size:0.65em;"><i class="bi bi-person"></i> ' + escapeHtml(a.createdByName || 'Otro') + '</span>' : ''}
-                </div>
-                <div class="fb-act-meta">
-                    <i class="bi bi-person"></i> ${escapeHtml(a.createdByName || 'Desconocido')}
-                    · <i class="bi bi-calendar"></i> ${created}
-                    · <i class="bi bi-arrow-clockwise"></i> Actualizada ${updated}
-                    ${criteriaCount > 0 ? `· <i class="bi bi-check2-square"></i> ${criteriaCount} criterios` : ''}
-                    ${studentCount > 0 ? `· <i class="bi bi-people"></i> ${studentCount} alumnos` : ''}
-                    ${hasScores ? `· <i class="bi bi-clipboard-check"></i> ${linkedScores.length} calif.` : ''}
-                </div>
-            </div>
-            <div class="fb-act-actions">
-                <button class="fb-act-action-btn load-btn" title="Cargar esta configuración en la app"><i class="bi bi-cloud-arrow-down"></i> Cargar</button>
-                <button class="fb-act-action-btn rename-btn" ${canEdit ? '' : 'disabled'} title="${canEdit ? (isOwner ? 'Renombrar (tuya)' : 'Renombrar') : 'No tienes permiso'}"><i class="bi bi-pencil"></i> Renombrar</button>
-                <button class="fb-act-action-btn delete-btn" ${canEdit ? '' : 'disabled'} title="${canEdit ? (isOwner ? 'Eliminar (tuya)' : 'Eliminar') : 'No tienes permiso'}"><i class="bi bi-trash3"></i> Eliminar</button>
-            </div>
-        `;
-        // Listeners
-        card.querySelector('.load-btn').addEventListener('click', () => fb_loadActivity(a));
-        card.querySelector('.rename-btn').addEventListener('click', () => fb_openRenameModal(a));
-        card.querySelector('.delete-btn').addEventListener('click', () => fb_deleteActivity(a));
-        wrapper.appendChild(card);
-
-        // Si tiene calificaciones vinculadas, crear contenedor hijo expandible
-        if (hasScores) {
-            const childrenContainer = document.createElement('div');
-            childrenContainer.className = 'fb-children-container';
-
-            linkedScores.forEach(s => {
-                const childCard = document.createElement('div');
-                childCard.className = 'fb-activity-card fb-child-card';
-                const sUpdated = s.updatedAt ? new Date(s.updatedAt).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }) : '—';
-                const sCreated = s.createdAt ? new Date(s.createdAt).toLocaleDateString('es-ES') : '—';
-                const sClassName = s.className || className || '';
-                const sGroupColorClass = sClassName ? `group-${groupColors[sClassName] || 0}` : '';
-                const sClassBadge = sClassName ? `<span class="fb-class-badge ${sGroupColorClass}"><i class="bi bi-mortarboard"></i> ${escapeHtml(sClassName)}</span>` : '';
-                const sStudentCount = s.data?.scores?.students?.length || 0;
-
-                childCard.innerHTML = `
-                    <div class="fb-act-icon"><i class="bi bi-clipboard-check"></i></div>
-                    <div class="fb-act-body">
-                        <div class="fb-act-name">
-                            ${escapeHtml(s.name || 'Calificaciones')}
-                            ${sClassBadge}
-                        </div>
-                        <div class="fb-act-meta">
-                            <i class="bi bi-person"></i> ${escapeHtml(s.createdByName || 'Desconocido')}
-                            · <i class="bi bi-calendar"></i> ${sCreated}
-                            · <i class="bi bi-arrow-clockwise"></i> ${sUpdated}
-                            ${sStudentCount > 0 ? `· <i class="bi bi-people"></i> ${sStudentCount} alumnos` : ''}
-                        </div>
-                    </div>
-                    <div class="fb-act-actions">
-                        <button class="fb-act-action-btn load-btn" title="Cargar estas calificaciones"><i class="bi bi-cloud-arrow-down"></i> Cargar calif.</button>
-                        <button class="fb-act-action-btn rename-btn" ${canEdit ? '' : 'disabled'} title="${canEdit ? 'Renombrar' : 'No tienes permiso'}"><i class="bi bi-pencil"></i></button>
-                        <button class="fb-act-action-btn delete-btn" ${canEdit ? '' : 'disabled'} title="${canEdit ? 'Eliminar' : 'No tienes permiso'}"><i class="bi bi-trash3"></i></button>
-                    </div>
-                `;
-                childCard.querySelector('.load-btn').addEventListener('click', () => {
-                    try {
-                        fb_applyScores(a.app, s.data);
-                        alert(`✅ Calificaciones "${s.name}" cargadas correctamente.`);
-                    } catch(e) { alert('Error al cargar calificaciones: ' + e.message); }
-                });
-                childCard.querySelector('.rename-btn').addEventListener('click', () => fb_openRenameModal(s));
-                childCard.querySelector('.delete-btn').addEventListener('click', () => fb_deleteActivity(s).then(() => fb_renderActivities()));
-                childrenContainer.appendChild(childCard);
-            });
-
-            wrapper.appendChild(childrenContainer);
-
-            // Listener del botón expandir
-            const toggle = card.querySelector('.fb-expand-toggle');
-            if (toggle) {
-                toggle.addEventListener('click', () => {
-                    const isExpanded = childrenContainer.classList.toggle('expanded');
-                    toggle.classList.toggle('expanded', isExpanded);
-                });
-            }
-        }
-
-        list.appendChild(wrapper);
-    });
-}
-
 // === RENDERIZADO DE USUARIOS (panel admin) ===
 function fb_renderUsers() {
     const list = document.getElementById('fbUsersList');
@@ -8959,6 +8337,9 @@ function fb_renderAdminActivities() {
         const className = a.className || '';
         const groupColorIdx = (className || '').split('').reduce((s, c) => s + c.charCodeAt(0), 0) % 8;
         const classBadge = className ? `<span class="fb-class-badge group-${groupColorIdx}"><i class="bi bi-mortarboard"></i> ${escapeHtml(className)}</span>` : '';
+        // Curso al que pertenece el registro (los datos están aislados por curso)
+        const recCourse = fbAllCourses.find(c => c.id === fb_resolveRecordCourseId(a));
+        const courseBadge = recCourse ? `<span class="badge bg-dark ms-1" style="font-size:0.65em;" title="Curso académico"><i class="bi bi-calendar3"></i> ${escapeHtml(recCourse.label)}</span>` : '';
         const iconClass = a.app === 'rubricas' ? 'bi-grid-1x2' : (a.app === 'exam' ? 'bi-pencil-square' : (a.app === 'test' ? 'bi-calculator' : (a.app === 'instrumentos' ? 'bi-grid-3x3-gap' : (a.app === 'ponderacion' ? 'bi-layers-half' : 'bi-check2-circle'))));
         card.innerHTML = `
             <div class="fb-act-icon"><i class="bi ${iconClass}"></i></div>
@@ -8968,6 +8349,7 @@ function fb_renderAdminActivities() {
                     <span class="badge bg-secondary" style="font-size:0.7em;">${escapeHtml(appLabel)}</span>
                     ${kindLabel}
                     ${classBadge}
+                    ${courseBadge}
                 </div>
                 <div class="fb-act-meta">
                     <i class="bi bi-person"></i> ${escapeHtml(a.createdByName || 'Desconocido')}
@@ -9544,46 +8926,6 @@ async function fb_changeOwnPassword() {
     }
 }
 
-// === GUARDAR ACTIVIDAD EN LA NUBE ===
-function fb_saveCurrentActivity() {
-    if (!fbCurrentUser) { alert('Debes iniciar sesión.'); return; }
-    // Tanto admin como usuarios pueden guardar sus propias actividades
-    const app = document.getElementById('fbCloudSourceApp')?.value;
-    const name = document.getElementById('fbCloudActivityName')?.value.trim();
-    const msgEl = document.getElementById('fbCloudSaveMessage');
-    if (!app) { if (msgEl) msgEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> Selecciona una app de origen.</span>'; return; }
-    if (!name) { if (msgEl) msgEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> Ponle un nombre a la actividad.</span>'; return; }
-    // Serializar estado de la app seleccionada
-    let data;
-    try {
-        data = fb_serializeAppState(app);
-    } catch(e) {
-        if (msgEl) msgEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> ${escapeHtml(e.message)}</span>`;
-        return;
-    }
-    if (!data) { if (msgEl) msgEl.innerHTML = '<span class="text-danger">No se pudo serializar la actividad.</span>'; return; }
-    // Comprobar si ya existe una actividad con el mismo nombre para esta app y usuario
-    fb_checkOverwrite(name, app, (existingId) => {
-        // Confirmado: guardar (nuevo o sobrescribir)
-        if (msgEl) msgEl.innerHTML = '<span class="text-info"><i class="bi bi-arrow-clockwise"></i> Guardando…</span>';
-        fb_saveConfigRecord(app, name, data, existingId,
-            (wasOverwrite) => {
-                if (msgEl) msgEl.innerHTML = wasOverwrite
-                    ? '<span class="text-success"><i class="bi bi-check-circle"></i> ✅ Actividad actualizada en la nube.</span>'
-                    : '<span class="text-success"><i class="bi bi-check-circle"></i> ✅ Actividad guardada en la nube.</span>';
-                document.getElementById('fbCloudActivityName').value = '';
-                setTimeout(() => { if (msgEl) msgEl.innerHTML = ''; }, 4000);
-            },
-            (err) => {
-                if (msgEl) msgEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> Error: ${escapeHtml(err.message)}</span>`;
-            }
-        );
-    }, () => {
-        // Cancelado: el usuario puede cambiar el nombre y reintentar
-        if (msgEl) msgEl.innerHTML = '<span class="text-info"><i class="bi bi-info-circle"></i> Cambia el nombre y vuelve a guardar, o usa uno diferente.</span>';
-    });
-}
-
 // Serializa el estado de la app indicada (solo configuración + alumnos, no scores)
 function fb_serializeAppState(app) {
     switch (app) {
@@ -9690,9 +9032,9 @@ function fb_loadActivity(activity) {
         alert('⚠️ No hay materia cargada. Importa una materia antes de cargar actividades de la nube.');
         return;
     }
-    // Buscar calificaciones vinculadas a esta configuración
+    // Buscar calificaciones vinculadas a esta configuración (mismo curso activo)
     const configId = fb_getConfigFingerprintForRecord(activity);
-    const linkedScores = configId ? fbAllActivities.filter(s => s.kind === 'scores' && s.app === app && s.configId === configId) : [];
+    const linkedScores = configId ? fbAllActivities.filter(s => s.kind === 'scores' && s.app === app && s.configId === configId && fb_recordInActiveCourse(s)) : [];
     // Ordenar scores por updatedAt desc (más reciente primero)
     linkedScores.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
@@ -9998,7 +9340,8 @@ function fb_getSubjectId() {
 }
 
 // Busca si ya existe una actividad (kind='config') con el mismo nombre, app, grupo, materia y usuario
-// Devuelve la actividad existente o null
+// en el curso activo (los datos están aislados por curso: el mismo nombre es
+// válido en cursos distintos). Devuelve la actividad existente o null
 function fb_findExistingConfig(name, app, uid, className) {
     if (!name || !app || !uid) return null;
     const cn = (className || '').trim().toLowerCase();
@@ -10009,7 +9352,8 @@ function fb_findExistingConfig(name, app, uid, className) {
         a.createdBy === uid &&
         (a.name || '').trim().toLowerCase() === name.trim().toLowerCase() &&
         (a.className || '').trim().toLowerCase() === cn &&
-        (a.subjectId || '') === subjectId
+        (a.subjectId || '') === subjectId &&
+        fb_recordInActiveCourse(a)
     ) || null;
 }
 
@@ -10109,16 +9453,13 @@ function fb_saveFromApp(app) {
     // Comprobar si ya existe una actividad con el mismo nombre para esta app y usuario
     fb_checkOverwrite(trimmed, app, (existingId) => {
         // Confirmado: guardar (nuevo o sobrescribir)
-        fb_setSyncState('syncing', 'Guardando en la nube…');
         fb_saveConfigRecord(app, trimmed, data, existingId,
             (wasOverwrite) => {
-                fb_setSyncState('synced', 'Sincronizado');
                 alert(wasOverwrite
                     ? `✅ Actividad "${trimmed}" actualizada en la nube.`
                     : `✅ Configuración "${trimmed}" guardada en la nube correctamente.`);
             },
             (err) => {
-                fb_setSyncState('error', 'Error al guardar');
                 alert('❌ Error al guardar en la nube: ' + err.message);
             }
         );
@@ -10169,6 +9510,8 @@ function fb_renderAppLoadList() {
     } else {
         filtered = fbAllActivities.filter(a => a.app === _fbAppLoadModalApp && (a.kind || 'config') === kind && a.createdBy === (fbCurrentUser && fbCurrentUser.uid));
     }
+    // Aislamiento por curso académico: solo registros del curso activo
+    filtered = filtered.filter(fb_recordInActiveCourse);
     // Filtrar por materia
     const currentSubjectId = fb_getSubjectFingerprint();
     if (currentSubjectId) {
@@ -10181,7 +9524,7 @@ function fb_renderAppLoadList() {
     if (kind === 'scores') {
         const currentConfigId = fb_getConfigFingerprint(_fbAppLoadModalApp);
         if (currentConfigId) {
-            const matchingConfig = fbAllActivities.find(a => a.kind === 'config' && a.app === _fbAppLoadModalApp && fb_getConfigFingerprintForRecord(a) === currentConfigId);
+            const matchingConfig = fbAllActivities.find(a => a.kind === 'config' && a.app === _fbAppLoadModalApp && fb_recordInActiveCourse(a) && fb_getConfigFingerprintForRecord(a) === currentConfigId);
             if (matchingConfig) configName = matchingConfig.name;
             const matchingScores = filtered.filter(a => a.configId === currentConfigId);
             if (matchingScores.length > 0) filtered = matchingScores;
@@ -10195,11 +9538,13 @@ function fb_renderAppLoadList() {
     if (countSpan) countSpan.textContent = filtered.length;
     const showOwnerBadge = isAdmin && _fbAppLoadOwnerFilter === 'all';
     if (filtered.length === 0) {
+        const activeCourse = fbAllCourses.find(c => c.id === fbCurrentCourseId);
+        const courseSuffix = activeCourse ? ` (aislado por curso: ${activeCourse.label})` : '';
         const msg = !currentSubjectId
             ? 'No hay materia cargada. Importa una materia para ver sus actividades en la nube.'
             : (kind === 'scores'
-                ? 'No hay calificaciones guardadas en la nube' + (configName ? ` para la configuración "${configName}".` : ' vinculadas a la configuración actual.')
-                : 'Aún no hay actividades de este tipo en la nube para esta materia.');
+                ? 'No hay calificaciones guardadas en la nube' + (configName ? ` para la configuración "${configName}".` : ' vinculadas a la configuración actual.') + courseSuffix
+                : 'Aún no hay actividades de este tipo en la nube para esta materia' + courseSuffix + '.');
         list.innerHTML = `<div class="text-center text-muted p-4"><i class="bi bi-cloud-slash" style="font-size:2.5rem;"></i><p class="mt-2 mb-0">${escapeHtml(msg)}</p></div>`;
         return;
     }
@@ -10574,7 +9919,8 @@ function fb_saveScoresFromApp(app) {
     if (!configId) { alert('No se pudo determinar la configuración actual.'); return; }
 
     // Buscar si ya existe una configuración en la nube con el mismo fingerprint
-    const matchingConfigs = fbAllActivities.filter(a => a.kind === 'config' && a.app === app && fb_getConfigFingerprintForRecord(a) === configId);
+    // (restringida al curso activo: aislamiento de datos entre cursos)
+    const matchingConfigs = fbAllActivities.filter(a => a.kind === 'config' && a.app === app && fb_recordInActiveCourse(a) && fb_getConfigFingerprintForRecord(a) === configId);
 
     let configName = '';
     let configRef = null;
@@ -10604,6 +9950,11 @@ function fb_saveScoresFromApp(app) {
             className: fb_getClassName(app),
             app: app,
             appLabel: FB_APP_LABELS[app] || app,
+            appId: FB_APP_ID,
+            subjectId: fb_getSubjectFingerprint(),
+            subjectName: subjectInfo.name || '',
+            subjectCourse: subjectInfo.course || '',
+            courseId: fbCurrentCourseId || null,
             data: fb_serializeAppState(app),
             createdAt: now,
             updatedAt: now,
@@ -10611,7 +9962,6 @@ function fb_saveScoresFromApp(app) {
             createdByName: fbCurrentUser ? fbCurrentUser.displayName : '',
             version: 1
         };
-        fb_setSyncState('syncing', 'Guardando configuración…');
         try {
             fbDb.ref(FB_ACTIVITIES_PATH).push(cfgRecord).then(snap => {
                 configRef = snap.key;
@@ -10619,7 +9969,6 @@ function fb_saveScoresFromApp(app) {
                 // Ahora guardar las calificaciones
                 _fb_doSaveScores(app, configId, configName, configRef);
             }).catch(err => {
-                fb_setSyncState('error', 'Error al guardar config');
                 alert('Error al guardar la configuración: ' + err.message);
             });
         } catch(e) {
@@ -10665,24 +10014,22 @@ function _fb_doSaveScores(app, configId, configName, configRef) {
         version: 1
     };
     // Buscar si ya existe un registro de calificaciones para esta configuración,
-    // app y usuario. Si existe, se actualiza (upsert) en vez de crear uno nuevo.
-    // Así solo hay una copia de calificaciones por actividad.
+    // app, usuario y curso activo. Si existe, se actualiza (upsert) en vez de crear
+    // uno nuevo. Así solo hay una copia de calificaciones por actividad y curso.
     const existingScores = fbAllActivities.find(a =>
         a.kind === 'scores' &&
         a.app === app &&
         a.configId === configId &&
-        a.createdBy === (fbCurrentUser && fbCurrentUser.uid)
+        a.createdBy === (fbCurrentUser && fbCurrentUser.uid) &&
+        fb_recordInActiveCourse(a)
     );
-    fb_setSyncState('syncing', 'Guardando calificaciones…');
     if (existingScores) {
         // Actualizar el registro existente (preservar createdAt)
         fbDb.ref(`${FB_ACTIVITIES_PATH}/${existingScores.id}`).update(record)
             .then(() => {
-                fb_setSyncState('synced', 'Sincronizado');
                 alert(`✅ Calificaciones actualizadas en la nube.\n\nVinculadas a la configuración: "${configName}"`);
             })
             .catch(err => {
-                fb_setSyncState('error', 'Error al guardar');
                 alert('❌ Error al actualizar calificaciones: ' + err.message);
             });
     } else {
@@ -10690,11 +10037,9 @@ function _fb_doSaveScores(app, configId, configName, configRef) {
         record.createdAt = now;
         fbDb.ref(FB_ACTIVITIES_PATH).push(record)
             .then(() => {
-                fb_setSyncState('synced', 'Sincronizado');
                 alert(`✅ Calificaciones "${trimmed}" guardadas en la nube.\n\nVinculadas a la configuración: "${configName}"`);
             })
             .catch(err => {
-                fb_setSyncState('error', 'Error al guardar');
                 alert('❌ Error al guardar calificaciones: ' + err.message);
             });
     }
@@ -10880,8 +10225,8 @@ function autosave_serialize() {
         // Se verifica al recibir datos de Firebase para evitar que esta app
         // aplique (o sobrescriba) datos de OTRA app que compartiera el mismo
         // proyecto Firebase / uid por accidente.
-        appId: (typeof FB_APP_ID !== 'undefined' ? FB_APP_ID : 'multimateria_v2'),
-        appRoot: (typeof FB_ROOT !== 'undefined' ? FB_ROOT : 'evaluacion_criterial_multimateria_v2'),
+        appId: FB_APP_ID,
+        appRoot: FB_ROOT,
         sessionId: AUTOSAVE_SESSION_ID,
         timestamp: Date.now(),
         subjectInfo: {
@@ -11209,12 +10554,14 @@ function autosave_saveScoresToCloud(app, configRef, configName) {
             version: 1
         };
 
-        // Buscar si ya existe un registro de calificaciones para esta config y usuario
+        // Buscar si ya existe un registro de calificaciones para esta config,
+        // usuario y curso activo (aislamiento de datos entre cursos)
         const existingScores = fbAllActivities.find(a =>
             a.kind === 'scores' &&
             a.app === app &&
             a.configId === configId &&
-            a.createdBy === fbCurrentUser.uid
+            a.createdBy === fbCurrentUser.uid &&
+            fb_recordInActiveCourse(a)
         );
 
         if (existingScores) {
@@ -11234,7 +10581,7 @@ function autosave_saveScoresToCloud(app, configRef, configName) {
 
 function autosave_pushToFirebase() {
     if (!fbCurrentUser || !fbDb) return;
-    const path = (typeof FB_ROOT !== 'undefined' ? FB_ROOT : 'evaluacion_criterial_multimateria_v2') +
+    const path = FB_ROOT +
                  '/sessions/' + fbCurrentUser.uid;
     const data = autosave_serialize();
     data.lastModifiedAt = Date.now();
@@ -11272,7 +10619,7 @@ function autosave_setupFirebaseSync() {
         _autosaveFbPath = null;
         return;
     }
-    _autosaveFbPath = (typeof FB_ROOT !== 'undefined' ? FB_ROOT : 'evaluacion_criterial_multimateria_v2') +
+    _autosaveFbPath = FB_ROOT +
                       '/sessions/' + fbCurrentUser.uid;
     autosave_setStatus('syncing', 'Conectando a la nube…');
     const ref = fbDb.ref(_autosaveFbPath);
@@ -11300,8 +10647,8 @@ function autosave_setupFirebaseSync() {
         // Si el dato no tiene appId (heredado de versión anterior), lo
         // aceptamos como nuestro y lo marcaremos con nuestro appId en el
         // próximo push.
-        const expectedAppId = (typeof FB_APP_ID !== 'undefined' ? FB_APP_ID : 'multimateria_v2');
-        const expectedAppRoot = (typeof FB_ROOT !== 'undefined' ? FB_ROOT : 'evaluacion_criterial_multimateria_v2');
+        const expectedAppId = FB_APP_ID;
+        const expectedAppRoot = FB_ROOT;
         if (data.appId && data.appId !== expectedAppId) {
             console.warn('[Autosave] Datos de otra app recibidos (appId=' + data.appId +
                          '). Ignorando para no corromper el estado local NI el remoto.');
@@ -11454,14 +10801,6 @@ function _autosave_rerenderAll() {
     } catch (e) {}
     try { if (typeof pond_renderImportCards === 'function') pond_renderImportCards(); } catch (e) {}
     try { if (document.getElementById('pond_screenResults') && document.getElementById('pond_screenResults').classList.contains('active') && typeof pond_renderResults === 'function') pond_renderResults(); } catch (e) {}
-    try { if (typeof fb_renderActivities === 'function') fb_renderActivities(); } catch (e) {}
-    // Sincronizar el nombre del panel cloud con la actividad actual
-    try {
-        const nameInput = document.getElementById('fbCloudActivityName');
-        if (nameInput && currentApp && currentApp !== 'home') {
-            nameInput.value = getActivityName(currentApp) || '';
-        }
-    } catch (e) {}
 }
 
 // --- Inicialización (llamar desde window.onload, después del setup existente) ---
@@ -11567,16 +10906,6 @@ function autosave_init() {
     }
 
     console.info('[Autosave] Sistema iniciado. sessionId=' + AUTOSAVE_SESSION_ID);
-}
-
-// Limpieza total del autosave (para reset manual desde consola si hace falta)
-function autosave_clearAll() {
-    if (!confirm('¿Borrar el estado guardado localmente por el autosave?\n\nEsto NO afecta a las actividades guardadas en la nube (Firebase). Solo borra el working-state cacheado en este navegador.')) return;
-    safeLSRemove(AUTOSAVE_KEY);
-    _autosaveLastHash = autosave_computeHash();
-    _autosaveLocalModifiedAt = 0;
-    autosave_setStatus('idle', 'Cache local borrada');
-    alert('✅ Cache local del autosave borrada. Recarga la página para volver a empezar en blanco.');
 }
 
 
@@ -12189,7 +11518,7 @@ window.onload = function() {
             }
         }
         html += '<span class="me-1">· Espacio: <strong>' + (window.FB_APP_ID || 'multimateria_v2') + '</strong></span>';
-        html += '<span>· by @angelmicelti · Multimateria v2.2</span>';
+        html += '<span>· by @angelmicelti · Multimateria v2.3</span>';
         footer.innerHTML = html;
     }
     // Leer la versión desde sw.js. Funciona en http/https (GitHub Pages).
@@ -12362,12 +11691,8 @@ window.onload = function() {
             fb_renderAdminActivities();
             bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAdminModal')).show();
         } else {
-            // Profesor: abrir panel de cuenta (acordeón cloud)
-            const panel = document.getElementById('fbCloudPanelCollapse');
-            if (panel) {
-                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(panel, { toggle: false });
-                bsCollapse.show();
-            }
+            // Profesor: abrir el modal de cuenta (panel de cuenta)
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAuthModal')).show();
         }
     });
     document.getElementById('fbLoginBtn')?.addEventListener('click', () => {
@@ -12477,33 +11802,6 @@ window.onload = function() {
     // Al cambiar a la pestaña de actividades del admin, renderizar la lista
     document.getElementById('fbAdminActivitiesTab')?.addEventListener('shown.bs.tab', fb_renderAdminActivities);
     document.getElementById('fbRenameConfirmBtn')?.addEventListener('click', fb_confirmRename);
-    document.getElementById('fbCloudLoginBtn')?.addEventListener('click', () => bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAuthModal')).show());
-    document.getElementById('fbCloudSaveBtn')?.addEventListener('click', fb_saveCurrentActivity);
-    // Al cambiar la app origen en el panel de guardado cloud, rellenar el nombre con el de la actividad actual
-    document.getElementById('fbCloudSourceApp')?.addEventListener('change', function() {
-        // Solo en Home: al cambiar la app origen, rellenar el nombre con el de esa actividad
-        if (currentApp === 'home') {
-            const nameInput = document.getElementById('fbCloudActivityName');
-            const n = getActivityName(this.value);
-            if (nameInput) nameInput.value = n || '';
-        }
-    });
-    document.getElementById('fbCloudRefreshBtn')?.addEventListener('click', () => { fb_subscribeActivities(); fb_subscribeUsers(); });
-    document.getElementById('fbCloudSearch')?.addEventListener('input', fb_renderActivities);
-    document.getElementById('fbCloudFilterApp')?.addEventListener('change', fb_renderActivities);
-    // Listeners de filtro de propietario (solo admin)
-    document.getElementById('fbCloudFilterMine')?.addEventListener('click', function() {
-        _cloudOwnerFilter = 'mine';
-        this.classList.add('active');
-        document.getElementById('fbCloudFilterAll')?.classList.remove('active');
-        fb_renderActivities();
-    });
-    document.getElementById('fbCloudFilterAll')?.addEventListener('click', function() {
-        _cloudOwnerFilter = 'all';
-        this.classList.add('active');
-        document.getElementById('fbCloudFilterMine')?.classList.remove('active');
-        fb_renderActivities();
-    });
     // Listeners para los botones de filtro del modal de carga (fbAppLoadModal)
     document.getElementById('fbAppLoadFilterMine')?.addEventListener('click', function() {
         _fbAppLoadOwnerFilter = 'mine';
@@ -12517,15 +11815,6 @@ window.onload = function() {
         document.getElementById('fbAppLoadFilterMine')?.classList.remove('active');
         fb_renderAppLoadList();
     });
-    document.getElementById('fbCloudFilterGroup')?.addEventListener('change', fb_renderActivities);
-    // Rotar el chevron del panel cloud al expandir/replegar
-    const cloudPanel = document.getElementById('fbCloudPanelCollapse');
-    const cloudChevron = document.getElementById('fbCloudPanelChevron');
-    if (cloudPanel && cloudChevron) {
-        cloudPanel.addEventListener('shown.bs.collapse', () => { cloudChevron.style.transform = 'rotate(0deg)'; });
-        cloudPanel.addEventListener('hidden.bs.collapse', () => { cloudChevron.style.transform = 'rotate(-90deg)'; });
-    }
-
     // Delegated listeners for FB app/scores save/load buttons
     document.addEventListener('click', function(e) {
         const saveAppBtn = e.target.closest('.fb-app-save-btn');
