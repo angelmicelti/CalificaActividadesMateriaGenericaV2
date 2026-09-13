@@ -7,7 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>EVALUACIÓN CRITERIAL · MULTIMATERIA · V2.0</title>
+    <title>EVALUACIÓN CRITERIAL · MULTIMATERIA · V2.1</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <meta name="theme-color" content="#0b4b6b">
@@ -1639,7 +1639,7 @@
 <body>
 <div id="intro-overlay">
     <div class="intro-title">EVALUACIÓN CRITERIAL<br>MULTIMATERIA</div>
-    <div class="intro-subtitle">by @angelmicelti · v2.0</div>
+    <div class="intro-subtitle">by @angelmicelti · v2.1</div>
 </div>
 
 <div class="container-custom">
@@ -1745,7 +1745,8 @@
                     <div id="fbCloudNotLoggedIn" class="text-center py-4">
                         <i class="bi bi-lock-fill" style="font-size:3rem; color:#ffc107;"></i>
                         <h5 class="mt-2 mb-2">Inicia sesión para acceder</h5>
-                        <p class="text-muted mb-3">Para guardar y recuperar actividades en la nube necesitas una cuenta de usuario.</p>
+                        <p class="text-muted mb-1">Para guardar y recuperar actividades en la nube necesitas una cuenta de usuario.</p>
+                        <p class="small text-muted mb-3"><i class="bi bi-shield-fill-check"></i> Accede con tu <b>usuario IdEA</b>. La contraseña inicial es tu propio usuario IdEA (podrás cambiarla al entrar).</p>
                         <button class="btn btn-warning btn-lg" id="fbCloudLoginBtn"><i class="bi bi-box-arrow-in-right"></i> Iniciar sesión</button>
                     </div>
                     <div id="fbCloudContent" style="display:none;">
@@ -2538,7 +2539,8 @@
                             <!-- Login -->
                             <div class="tab-pane fade show active" id="fbAuthLoginPane" role="tabpanel">
                                 <div class="fb-auth-form">
-                                    <input type="text" class="form-control" id="fbLoginEmail" placeholder="Nombre de usuario" autocomplete="username">
+                                    <div class="alert alert-warning small py-2 px-3 mb-2"><i class="bi bi-shield-fill-check"></i> <b>Debes iniciar sesión con tu usuario IdEA</b> (el mismo que usas en las aplicaciones de la Junta de Andalucía, p. ej. <b>mbaeesp634</b>).<br><i class="bi bi-key"></i> La contraseña inicial coincide con tu usuario IdEA; podrás cambiarla después de iniciar sesión desde tu panel de cuenta.</div>
+                                    <input type="text" class="form-control" id="fbLoginEmail" placeholder="Usuario IdEA (p. ej. mbaeesp634)" autocomplete="username">
                                     <input type="password" class="form-control" id="fbLoginPassword" placeholder="Contraseña" autocomplete="current-password">
                                     <button class="btn btn-warning btn-lg w-100" id="fbLoginBtn"><i class="bi bi-box-arrow-in-right"></i> Entrar</button>
                                 </div>
@@ -2573,6 +2575,7 @@
                         <div class="alert alert-info small py-1 px-2 mb-2"><i class="bi bi-shield-lock"></i> Tus datos y actividades están aislados en un espacio propio de esta app y no se mezclan con los de otras aplicaciones del proyecto.</div>
                         <div class="d-flex flex-column gap-2">
                             <button class="btn btn-outline-primary" id="fbAccountManageUsersBtn"><i class="bi bi-people-fill"></i> Gestionar usuarios <span class="badge bg-danger d-none" id="fbAccountUsersBadge"></span></button>
+                            <button class="btn btn-outline-primary" id="fbAccountChangePasswordBtn"><i class="bi bi-key"></i> Cambiar contraseña</button>
                             <button class="btn btn-outline-secondary" id="fbAccountChangeNameBtn"><i class="bi bi-pencil"></i> Cambiar nombre para mostrar</button>
                             <button class="btn btn-outline-danger" id="fbAccountLogoutBtn"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</button>
                             <button class="btn btn-outline-danger btn-sm" id="fbAccountDeleteBtn"><i class="bi bi-trash3"></i> Eliminar mi cuenta definitivamente</button>
@@ -2603,7 +2606,7 @@
                     <div class="tab-content">
                         <!-- TAB 1: Gestión de usuarios -->
                         <div class="tab-pane fade show active" id="fbAdminUsersPane" role="tabpanel">
-                            <div class="alert alert-warning small mb-3"><i class="bi bi-shield-fill-exclamation"></i> Como administrador puedes añadir, editar y eliminar usuarios, cambiar su perfil (Administrador/Profesor) y restablecer sus contraseñas. <b>No puedes eliminarte a ti mismo ni quitarte el rol de administrador</b>.</div>
+                            <div class="alert alert-warning small mb-3"><i class="bi bi-shield-fill-exclamation"></i> Como administrador puedes añadir, <b>importar desde Excel</b>, editar y eliminar usuarios, cambiar su perfil (Administrador/Profesor) y restablecer sus contraseñas. Los usuarios importados acceden con su <b>usuario IdEA</b> como usuario y contraseña inicial, y podrán cambiarla desde su panel de cuenta. <b>No puedes eliminarte a ti mismo ni quitarte el rol de administrador</b>.</div>
                             <div class="d-flex flex-wrap gap-2 mb-3">
                                 <span class="badge bg-secondary fs-6">Total: <span id="fbUsersCount">0</span></span>
                                 <span class="badge bg-danger fs-6">Admins: <span id="fbUsersAdminCount">0</span></span>
@@ -2633,8 +2636,86 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-success me-auto" id="fbUsersAddBtn"><i class="bi bi-person-plus"></i> Añadir nuevo usuario</button>
+                    <button class="btn btn-outline-success me-auto" id="fbUsersImportBtn" title="Importar múltiples usuarios desde el fichero Excel del personal del centro"><i class="bi bi-file-earmark-arrow-up"></i> Importar usuarios (Excel)</button>
+                    <button class="btn btn-success" id="fbUsersAddBtn"><i class="bi bi-person-plus"></i> Añadir nuevo usuario</button>
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL IMPORTAR USUARIOS DESDE EXCEL (solo admin) -->
+    <div class="modal fade" id="fbImportUsersModal" tabindex="-1" aria-labelledby="fbImportUsersModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(145deg, #198754, #0f6b3f);">
+                    <h5 class="modal-title text-white" id="fbImportUsersModalLabel"><i class="bi bi-file-earmark-arrow-up me-2"></i>Importar usuarios desde Excel</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Paso 1: selección de fichero -->
+                    <div id="fbImportStep1">
+                        <div class="alert alert-info small mb-3"><i class="bi bi-info-circle-fill"></i> Selecciona el fichero Excel (<b>.xls, .xlsx o .csv</b>) con el personal del centro. Se admiten dos formatos:
+                            <ul class="mb-0 mt-1">
+                                <li><b>RelPerCen (Séneca)</b>: hoja «PERSONAL DEL CENTRO» con la columna <b>Usuario IdEA</b>. Cada usuario se crea con su usuario IdEA y como contraseña inicial su propio usuario IdEA.</li>
+                                <li><b>Listado simplificado</b>: columnas <b>Nombre · Usuario · Contraseña · Rol · Tutoría</b>. Si la columna Contraseña está vacía, se usa el usuario como contraseña.</li>
+                            </ul>
+                        </div>
+                        <div class="alert alert-secondary small py-2 px-3 mb-3"><i class="bi bi-shield-lock"></i> Si un usuario ya existe, se omite (no se toca su contraseña). Con la app abierta podrás verlos en la lista y cada usuario podrá cambiar su contraseña desde su panel de cuenta.</div>
+                        <label for="fbImportFileInput" class="btn btn-success btn-lg w-100"><i class="fas fa-file-import"></i> Seleccionar fichero Excel</label>
+                        <input type="file" id="fbImportFileInput" accept=".xls,.xlsx,.csv" class="hidden">
+                        <div id="fbImportParseMsg" class="small mt-2"></div>
+                    </div>
+                    <!-- Paso 2: previsualización -->
+                    <div id="fbImportStep2" style="display:none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="fw-semibold"><i class="bi bi-eye"></i> Usuarios detectados: <span id="fbImportCount">0</span> <span class="badge bg-secondary ms-1" id="fbImportFormatBadge"></span></span>
+                            <button class="btn btn-sm btn-outline-secondary" id="fbImportResetBtn" type="button"><i class="bi bi-arrow-left"></i> Elegir otro fichero</button>
+                        </div>
+                        <div id="fbImportPreviewWrap" style="max-height:280px; overflow:auto; border:1px solid #dee2e6; border-radius:.375rem;">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light"><tr><th>#</th><th>Nombre</th><th>Usuario IdEA</th><th>Rol</th><th>Tutoría</th><th>Estado</th></tr></thead>
+                                <tbody id="fbImportPreviewBody"></tbody>
+                            </table>
+                        </div>
+                        <div id="fbImportParseErrors" class="small mt-2"></div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="checkbox" id="fbImportOverwriteRole">
+                            <label class="form-check-label small" for="fbImportOverwriteRole">Si un usuario ya existe en la aplicación, actualizar su rol y tutoría según el fichero (no afecta a su contraseña)</label>
+                        </div>
+                    </div>
+                    <!-- Progreso y resultados -->
+                    <div id="fbImportProgress" style="display:none;" class="mt-3">
+                        <div class="progress" style="height:20px;"><div class="progress-bar progress-bar-striped progress-bar-animated bg-success" id="fbImportProgressBar" style="width:0%;">0%</div></div>
+                        <div id="fbImportResults" class="mt-2 small" style="max-height:220px; overflow:auto;"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button class="btn btn-success" id="fbImportExecuteBtn" disabled style="display:none;"><i class="bi bi-people-fill"></i> Importar usuarios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CAMBIAR CONTRASEÑA (usuario autenticado) -->
+    <div class="modal fade" id="fbChangePasswordModal" tabindex="-1" aria-labelledby="fbChangePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background: linear-gradient(145deg, #0d6efd, #0b5ed7);">
+                    <h5 class="modal-title text-white" id="fbChangePasswordModalLabel"><i class="bi bi-key me-2"></i>Cambiar mi contraseña</h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info small py-2 px-3"><i class="bi bi-info-circle"></i> Tu contraseña inicial era tu <b>usuario IdEA</b>. Si la cambias aquí, la nueva contraseña será la que uses en el próximo inicio de sesión.</div>
+                    <input type="password" class="form-control mb-2" id="fbChangePwCurrent" placeholder="Contraseña actual" autocomplete="current-password">
+                    <input type="password" class="form-control mb-2" id="fbChangePwNew" placeholder="Contraseña nueva (mínimo 6 caracteres)" autocomplete="new-password">
+                    <input type="password" class="form-control" id="fbChangePwConfirm" placeholder="Repite la contraseña nueva" autocomplete="new-password">
+                    <div id="fbChangePwMessage" class="small mt-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" id="fbChangePwConfirmBtn"><i class="bi bi-check2-circle"></i> Guardar contraseña</button>
                 </div>
             </div>
         </div>
@@ -8887,6 +8968,402 @@ function fb_adminDeleteUserActivities(u) {
         .catch(err => alert('Error al eliminar algunas actividades: ' + err.message));
 }
 
+// ============================================================
+// === IMPORTACIÓN MASIVA DE USUARIOS DESDE EXCEL (solo admin) ===
+// ============================================================
+// Soporta dos formatos de fichero:
+//   A) RelPerCen de Séneca: hoja «PERSONAL DEL CENTRO» con columna «Usuario IdEA»
+//      → contraseña inicial de cada usuario = su propio usuario IdEA
+//   B) Listado simplificado: Nombre · Usuario · Contraseña · Rol · Tutoría
+//      (si la contraseña viene vacía, se usa el usuario IdEA)
+// Las cabeceras se normalizan (minúsculas, sin acentos ni signos) para
+// tolerar variantes del fichero exportado por Séneca o editado a mano.
+
+let _fbImportParsed = null;   // usuarios parseados pendientes de importar
+let _fbImportRunning = false; // bloquea ejecuciones simultáneas
+
+// Normaliza una cabecera: minúsculas, sin acentos, solo caracteres alfanuméricos
+function fb_normHeader(h) {
+    return String(h ?? '')
+        .trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quitar acentos
+        .replace(/[^a-z0-9]/g, ''); // eliminar /, espacios, puntos, etc.
+}
+
+// Devuelve el índice de la primera columna cuya cabecera coincida con alguna variante
+function fb_pickColumn(headers, candidates) {
+    for (const cand of candidates) {
+        const idx = headers.indexOf(cand);
+        if (idx !== -1) return idx;
+    }
+    return -1;
+}
+
+// Parsea un workbook de SheetJS y devuelve { users:[], errors:[], format:'' }
+function fb_parseUsersWorkbook(wb) {
+    const users = [];
+    const errors = [];
+    const seen = new Set();
+    let format = '';
+    if (!wb || !wb.SheetNames || !wb.SheetNames.length) {
+        errors.push('El fichero no contiene ninguna hoja de cálculo.');
+        return { users, errors, format };
+    }
+    for (const sheetName of wb.SheetNames) {
+        const sheet = wb.Sheets[sheetName];
+        if (!sheet) continue;
+        let rows;
+        try {
+            rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+        } catch (e) { continue; }
+        if (!rows || rows.length < 2) continue;
+        // Localizar la fila de cabeceras: la primera (hasta la fila 10) que
+        // contenga una columna de usuario reconocible.
+        let headerRow = -1, cUser = -1, cName = -1, cPass = -1, cRole = -1, cTut = -1;
+        for (let r = 0; r < Math.min(rows.length, 10); r++) {
+            const headers = (rows[r] || []).map(fb_normHeader);
+            if (!headers.length) continue;
+            const cu = fb_pickColumn(headers, ['usuarioidea', 'usuariodeea', 'usuario', 'username']);
+            if (cu === -1) continue;
+            const cn = fb_pickColumn(headers, ['empleadoslasha', 'empleadoa', 'empleado', 'nombre', 'nombrecompleto', 'nombreyapellidos', 'apellidosynombre', 'profesor', 'docente']);
+            const cp = fb_pickColumn(headers, ['contrasena', 'contrasenia', 'password', 'clave', 'pass']);
+            const cr = fb_pickColumn(headers, ['rol', 'perfil', 'tipousuario']);
+            const ct = fb_pickColumn(headers, ['tutoria', 'tutorias', 'grupo', 'grupotutoria']);
+            headerRow = r; cUser = cu; cName = cn; cPass = cp; cRole = cr; cTut = ct;
+            if (!format) {
+                format = (headers.includes('usuarioidea') || headers.includes('usuariodeea')) ? 'RelPerCen (Séneca)' : 'Listado simplificado';
+            }
+            break;
+        }
+        if (headerRow === -1) {
+            errors.push(`Hoja "${sheetName}": no se encontró una columna de usuario (se admite «Usuario IdEA» o «Usuario»). Hoja omitida.`);
+            continue;
+        }
+        // Recorrer las filas de datos
+        for (let r = headerRow + 1; r < rows.length; r++) {
+            const row = rows[r] || [];
+            if (!row.length) continue;
+            const rawUser = String(row[cUser] ?? '').trim();
+            if (!rawUser) continue; // fila sin usuario (vacía) → ignorar
+            const username = rawUser.toLowerCase().replace(/\s+/g, '');
+            if (!fb_isValidUsername(username)) {
+                errors.push(`Fila ${r + 1} (hoja "${sheetName}"): "${rawUser}" no es un usuario válido (3-30 caracteres alfanuméricos, . _ -).`);
+                continue;
+            }
+            if (seen.has(username)) {
+                errors.push(`Fila ${r + 1} (hoja "${sheetName}"): usuario "${username}" duplicado en el fichero.`);
+                continue;
+            }
+            // Contraseña: la del fichero o, si no viene, el propio usuario IdEA
+            let password = (cPass >= 0 ? String(row[cPass] ?? '').trim() : '');
+            if (!password) password = username;
+            if (password.length < 6) {
+                errors.push(`Fila ${r + 1} (hoja "${sheetName}"): usuario "${username}" omitido — su contraseña tendría menos de 6 caracteres.`);
+                continue;
+            }
+            // Nombre para mostrar
+            let displayName = (cName >= 0 ? String(row[cName] ?? '').trim() : '');
+            if (!displayName) displayName = username;
+            displayName = displayName.replace(/\s+/g, ' ');
+            // Rol: solo se acepta "admin" si la celda lo indica; el resto son profesores
+            const rawRole = (cRole >= 0 ? fb_normHeader(row[cRole]) : '');
+            const role = rawRole.includes('admin') ? 'admin' : 'user';
+            // Tutoría (opcional)
+            const tutoria = (cTut >= 0 ? String(row[cTut] ?? '').trim() : '');
+            seen.add(username);
+            users.push({ displayName, username, password, role, tutoria });
+        }
+    }
+    if (!users.length && !errors.length) {
+        errors.push('No se han encontrado filas de usuarios válidas en el fichero.');
+    }
+    return { users, errors, format };
+}
+
+// Al seleccionar un fichero: leer, parsear y mostrar la previsualización
+function fb_importUsers_onFile(evt) {
+    const file = evt.target.files && evt.target.files[0];
+    if (!file) return;
+    const msgEl = document.getElementById('fbImportParseMsg');
+    const execBtn = document.getElementById('fbImportExecuteBtn');
+    msgEl.innerHTML = '<span class="text-info"><i class="bi bi-arrow-repeat"></i> Leyendo fichero…</span>';
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const wb = XLSX.read(e.target.result, { type: 'binary' });
+            const parsed = fb_parseUsersWorkbook(wb);
+            _fbImportParsed = parsed.users;
+            document.getElementById('fbImportStep1').style.display = 'none';
+            document.getElementById('fbImportStep2').style.display = '';
+            document.getElementById('fbImportProgress').style.display = 'none';
+            execBtn.style.display = '';
+            execBtn.disabled = _fbImportParsed.length === 0;
+            document.getElementById('fbImportCount').textContent = _fbImportParsed.length;
+            document.getElementById('fbImportFormatBadge').textContent = parsed.format || 'Formato no identificado';
+            fb_renderImportPreview(parsed);
+            msgEl.innerHTML = '';
+        } catch (err) {
+            console.error('Error leyendo Excel:', err);
+            msgEl.innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> No se pudo leer el fichero: ${escapeHtml(err.message || String(err))}</span>`;
+            evt.target.value = '';
+        }
+    };
+    reader.onerror = () => {
+        msgEl.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> No se pudo leer el fichero.</span>';
+    };
+    reader.readAsBinaryString(file);
+}
+
+// Dibuja la tabla de previsualización de usuarios a importar
+function fb_renderImportPreview(parsed) {
+    const body = document.getElementById('fbImportPreviewBody');
+    const errEl = document.getElementById('fbImportParseErrors');
+    if (!body) return;
+    body.innerHTML = '';
+    parsed.users.forEach((u, i) => {
+        const existing = fbAllUsers.find(x => (x.username || '').toLowerCase() === u.username);
+        const tr = document.createElement('tr');
+        const status = existing
+            ? '<span class="badge bg-secondary">Ya existe</span>'
+            : '<span class="badge bg-success">Nuevo</span>';
+        tr.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${escapeHtml(u.displayName)}</td>
+            <td class="fw-semibold">${escapeHtml(u.username)}</td>
+            <td><span class="badge ${u.role === 'admin' ? 'bg-danger' : 'bg-primary'}">${u.role === 'admin' ? 'Admin' : 'Profesor'}</span></td>
+            <td>${escapeHtml(u.tutoria || '—')}</td>
+            <td>${status}</td>`;
+        body.appendChild(tr);
+    });
+    if (parsed.errors && parsed.errors.length) {
+        errEl.innerHTML = '<div class="alert alert-warning py-1 px-2 mb-0"><i class="bi bi-exclamation-triangle"></i> Filas ignoradas:<ul class="mb-0 ps-3">' + parsed.errors.map(e => `<li>${escapeHtml(e)}</li>`).join('') + '</ul></div>';
+    } else {
+        errEl.innerHTML = '';
+    }
+}
+
+// Vuelve al paso 1 (limpia el asistente de importación)
+function fb_importUsers_reset() {
+    _fbImportParsed = null;
+    const s1 = document.getElementById('fbImportStep1');
+    const s2 = document.getElementById('fbImportStep2');
+    const prog = document.getElementById('fbImportProgress');
+    if (s1) s1.style.display = '';
+    if (s2) s2.style.display = 'none';
+    if (prog) prog.style.display = 'none';
+    const execBtn = document.getElementById('fbImportExecuteBtn');
+    if (execBtn) { execBtn.style.display = 'none'; execBtn.disabled = true; }
+    const fi = document.getElementById('fbImportFileInput');
+    if (fi) fi.value = '';
+    const pm = document.getElementById('fbImportParseMsg');
+    if (pm) pm.innerHTML = '';
+}
+
+// Ejecuta la importación masiva.
+// Usa una instancia SECUNDARIA de Firebase Auth para crear las cuentas sin
+// cerrar la sesión del administrador en la app principal.
+async function fb_importUsers_execute() {
+    if (!fbCurrentUser || fbCurrentUser.role !== 'admin') { alert('Solo un administrador puede importar usuarios.'); return; }
+    if (!fbAuth || !fbAuth.currentUser) { alert('Tu sesión ha caducado. Vuelve a iniciar sesión e inténtalo de nuevo.'); return; }
+    if (!_fbImportParsed || !_fbImportParsed.length) { alert('No hay usuarios para importar. Selecciona antes un fichero válido.'); return; }
+    if (_fbImportRunning) return;
+    if (!confirm(`¿Importar ${_fbImportParsed.length} usuario(s)?\n\nSe creará una cuenta por usuario con:\n• Usuario: su usuario IdEA\n• Contraseña inicial: su propio usuario IdEA\n\nLos usuarios que ya existen en la aplicación se omitirán.`)) return;
+    _fbImportRunning = true;
+    const execBtn = document.getElementById('fbImportExecuteBtn');
+    execBtn.disabled = true;
+    const progWrap = document.getElementById('fbImportProgress');
+    const bar = document.getElementById('fbImportProgressBar');
+    const resEl = document.getElementById('fbImportResults');
+    progWrap.style.display = '';
+    resEl.innerHTML = '';
+
+    const total = _fbImportParsed.length;
+    let done = 0, created = 0, restored = 0, updated = 0, skipped = 0, failed = 0;
+    const results = [];
+
+    // App secundaria de Firebase
+    let secApp = null;
+    try {
+        try { secApp = firebase.app('fbImportSecondary'); } catch (e) { secApp = null; }
+        if (!secApp) secApp = firebase.initializeApp(FB_CONFIG, 'fbImportSecondary');
+    } catch (e) {
+        alert('No se pudo inicializar Firebase para la importación: ' + e.message);
+        _fbImportRunning = false; execBtn.disabled = false;
+        return;
+    }
+    const secAuth = secApp.auth();
+    const overwriteRole = document.getElementById('fbImportOverwriteRole')?.checked;
+
+    const addResult = (icon, cls, text) => {
+        results.push(`<div class="${cls}"><i class="bi ${icon}"></i> ${text}</div>`);
+        resEl.innerHTML = results.slice(-300).join('');
+        resEl.scrollTop = resEl.scrollHeight;
+    };
+    const updateProgress = () => {
+        const pct = total ? Math.round((done / total) * 100) : 100;
+        bar.style.width = pct + '%';
+        bar.textContent = `${pct}% (${done}/${total})`;
+    };
+    updateProgress();
+
+    for (const u of _fbImportParsed) {
+        const email = fb_usernameToEmail(u.username);
+        try {
+            const existing = fbAllUsers.find(x => (x.username || '').toLowerCase() === u.username);
+            if (existing) {
+                if (overwriteRole && existing.uid !== fbCurrentUser.uid && (existing.role || 'user') !== u.role) {
+                    // Evitar dejar la app sin administradores
+                    const adminCount = fbAllUsers.filter(x => x.role === 'admin').length;
+                    if (existing.role === 'admin' && u.role === 'user' && adminCount <= 1) {
+                        skipped++;
+                        addResult('bi-exclamation-circle', 'text-warning', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): es el único administrador; rol no modificado.`);
+                    } else {
+                        const patch = { role: u.role };
+                        if (u.tutoria) patch.tutoria = u.tutoria;
+                        await fbDb.ref(`${FB_USERS_PATH}/${existing.uid}`).update(patch);
+                        updated++;
+                        addResult('bi-arrow-repeat', 'text-info', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): ya existía — rol actualizado a ${u.role === 'admin' ? 'Administrador' : 'Profesor'}.`);
+                    }
+                } else {
+                    skipped++;
+                    addResult('bi-slash-circle', 'text-muted', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): ya estaba registrado, se omite.`);
+                }
+            } else {
+                let uid = null, wasRestore = false;
+                try {
+                    // 1) Crear la cuenta de autenticación (contraseña inicial = usuario IdEA)
+                    const cred = await secAuth.createUserWithEmailAndPassword(email, u.password);
+                    uid = cred.user.uid;
+                    try { await cred.user.updateProfile({ displayName: u.displayName }); } catch (e) {}
+                    try { await secAuth.signOut(); } catch (e) {}
+                } catch (err) {
+                    if (err && err.code === 'auth/email-already-in-use') {
+                        // 2) La cuenta de Auth ya existía (p. ej. cuenta compartida del
+                        //    proyecto o registro de la app borrado). Si la contraseña del
+                        //    fichero coincide, recuperamos el uid iniciando sesión en la
+                        //    app secundaria; si no, se omite.
+                        try {
+                            const si = await secAuth.signInWithEmailAndPassword(email, u.password);
+                            uid = si.user.uid;
+                            try { await secAuth.signOut(); } catch (e) {}
+                        } catch (e2) { uid = null; }
+                        if (uid) {
+                            const snap = await fbDb.ref(`${FB_USERS_PATH}/${uid}`).once('value');
+                            if (snap.exists()) {
+                                skipped++;
+                                addResult('bi-slash-circle', 'text-muted', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): la cuenta ya existía, se omite.`);
+                                uid = null;
+                            } else {
+                                wasRestore = true;
+                            }
+                        } else {
+                            skipped++;
+                            addResult('bi-exclamation-circle', 'text-warning', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): la cuenta de acceso ya existía con otra contraseña; se omite (puede entrar con su contraseña actual).`);
+                            uid = null;
+                        }
+                    } else {
+                        throw err;
+                    }
+                }
+                if (uid) {
+                    // 3) Crear el registro del usuario en la base de datos
+                    const record = {
+                        uid: uid,
+                        username: u.username,
+                        email: email,
+                        displayName: u.displayName,
+                        role: u.role,
+                        appId: FB_APP_ID,
+                        source: 'import',
+                        createdAt: Date.now(),
+                        importedAt: Date.now()
+                    };
+                    if (u.tutoria) record.tutoria = u.tutoria;
+                    await fbDb.ref(`${FB_USERS_PATH}/${uid}`).set(record);
+                    if (wasRestore) {
+                        restored++;
+                        addResult('bi-cloud-arrow-down', 'text-info', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): cuenta recuperada — registro de la app creado (contraseña correcta).`);
+                    } else {
+                        created++;
+                        addResult('bi-person-check', 'text-success', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): cuenta creada. Contraseña inicial: <b>${escapeHtml(u.username)}</b>.`);
+                    }
+                }
+            }
+        } catch (err) {
+            failed++;
+            console.error('Error importando usuario:', u, err);
+            let msg = err && err.message ? err.message : String(err);
+            if (err && err.code === 'auth/weak-password') msg = 'contraseña demasiado débil (mínimo 6 caracteres).';
+            if (err && err.code === 'auth/too-many-requests') msg = 'demasiadas peticiones a Firebase; reintenta en unos minutos.';
+            addResult('bi-x-circle', 'text-danger', `<b>${escapeHtml(u.displayName)}</b> (@${u.username}): error — ${escapeHtml(msg)}`);
+        }
+        done++;
+        updateProgress();
+        await new Promise(r => setTimeout(r, 300)); // pausa entre cuentas para no saturar Firebase
+    }
+
+    // Cerrar y eliminar la app secundaria
+    try { await secAuth.signOut(); } catch (e) {}
+    try { await secApp.delete(); } catch (e) {}
+
+    addResult('bi-check-circle-fill', 'text-success fw-bold', `<b>Resumen:</b> ${created} cuenta(s) creada(s), ${restored} recuperada(s), ${updated} actualizada(s), ${skipped} omitida(s), ${failed} con error.`);
+    if (created + restored > 0) {
+        addResult('bi-key', 'text-info', '<b>Acceso:</b> los usuarios entran con su usuario IdEA y como contraseña su propio usuario IdEA. Podrán cambiarla desde su panel de cuenta (botón «Cambiar contraseña») tras iniciar sesión.');
+    }
+    bar.classList.remove('progress-bar-animated');
+    _fbImportRunning = false;
+    execBtn.style.display = 'none';
+    try { fb_renderUsers(); } catch (e) {}
+}
+
+// === CAMBIO DE CONTRASEÑA DEL PROPIO USUARIO ===
+// Requiere reautenticación con la contraseña actual y luego actualiza la nueva.
+async function fb_changeOwnPassword() {
+    const msgEl = document.getElementById('fbChangePwMessage');
+    const show = (text, type) => {
+        if (!msgEl) return;
+        const cls = type === 'success' ? 'alert-success' : (type === 'warning' ? 'alert-warning' : 'alert-danger');
+        const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+        msgEl.innerHTML = `<div class="alert ${cls} py-1 px-2 mb-0"><i class="bi ${icon}"></i> ${escapeHtml(text)}</div>`;
+    };
+    const authUser = fbAuth && fbAuth.currentUser;
+    if (!authUser) { show('No hay sesión activa. Inicia sesión de nuevo.', 'danger'); return; }
+    const cur = document.getElementById('fbChangePwCurrent').value;
+    const nw = document.getElementById('fbChangePwNew').value;
+    const cf = document.getElementById('fbChangePwConfirm').value;
+    if (!cur || !nw || !cf) { show('Completa todos los campos.', 'danger'); return; }
+    if (nw.length < 6) { show('La contraseña nueva debe tener al menos 6 caracteres.', 'danger'); return; }
+    if (nw !== cf) { show('Las contraseñas nuevas no coinciden.', 'danger'); return; }
+    if (nw === cur) { show('La contraseña nueva debe ser distinta de la actual.', 'warning'); return; }
+    const confirmBtn = document.getElementById('fbChangePwConfirmBtn');
+    confirmBtn.disabled = true;
+    try {
+        const email = authUser.email || fb_usernameToEmail((fbCurrentUser && fbCurrentUser.username) || '');
+        const cred = firebase.auth.EmailAuthProvider.credential(email, cur);
+        await authUser.reauthenticateWithCredential(cred);
+        await authUser.updatePassword(nw);
+        show('Contraseña actualizada correctamente.', 'success');
+        document.getElementById('fbChangePwCurrent').value = '';
+        document.getElementById('fbChangePwNew').value = '';
+        document.getElementById('fbChangePwConfirm').value = '';
+        setTimeout(() => {
+            try { bootstrap.Modal.getOrCreateInstance(document.getElementById('fbChangePasswordModal')).hide(); } catch (e) {}
+            alert('✅ Tu contraseña se ha cambiado correctamente.\n\nRecuerda usar la nueva contraseña en tu próximo inicio de sesión.');
+        }, 600);
+    } catch (err) {
+        console.error('Error cambiando contraseña:', err);
+        let msg = 'No se pudo cambiar la contraseña: ' + (err.message || '');
+        if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'La contraseña actual no es correcta.';
+        else if (err.code === 'auth/weak-password') msg = 'La contraseña nueva es demasiado débil (mínimo 6 caracteres).';
+        else if (err.code === 'auth/requires-recent-login') msg = 'Por seguridad, cierra sesión, vuelve a iniciarla e inténtalo de nuevo.';
+        else if (err.code === 'auth/too-many-requests') msg = 'Demasiados intentos. Espera un momento e inténtalo de nuevo.';
+        else if (err.code === 'auth/network-request-failed') msg = 'Error de red. Comprueba tu conexión e inténtalo de nuevo.';
+        show(msg, 'danger');
+    } finally {
+        confirmBtn.disabled = false;
+    }
+}
+
 // === GUARDAR ACTIVIDAD EN LA NUBE ===
 function fb_saveCurrentActivity() {
     if (!fbCurrentUser) { alert('Debes iniciar sesión.'); return; }
@@ -11532,7 +12009,7 @@ window.onload = function() {
             }
         }
         html += '<span class="me-1">· Espacio: <strong>' + (window.FB_APP_ID || 'multimateria_v2') + '</strong></span>';
-        html += '<span>· by @angelmicelti · Multimateria v2.0</span>';
+        html += '<span>· by @angelmicelti · Multimateria v2.1</span>';
         footer.innerHTML = html;
     }
     // Leer la versión desde sw.js. Funciona en http/https (GitHub Pages).
@@ -11784,6 +12261,37 @@ window.onload = function() {
         if (registerTab) new bootstrap.Tab(registerTab).show();
         bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAuthModal')).show();
     });
+    // === IMPORTAR USUARIOS DESDE EXCEL (solo admin) ===
+    let _fbImportReturnToAdmin = false;
+    document.getElementById('fbUsersImportBtn')?.addEventListener('click', () => {
+        _fbImportReturnToAdmin = true;
+        fb_importUsers_reset();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAdminModal')).hide();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('fbImportUsersModal')).show();
+    });
+    document.getElementById('fbImportUsersModal')?.addEventListener('hidden.bs.modal', () => {
+        // Al cerrar el asistente de importación, volver al panel de administración
+        if (_fbImportReturnToAdmin && fbCurrentUser && fbCurrentUser.role === 'admin') {
+            _fbImportReturnToAdmin = false;
+            fb_renderUsers();
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAdminModal')).show();
+        } else {
+            _fbImportReturnToAdmin = false;
+        }
+    });
+    document.getElementById('fbImportFileInput')?.addEventListener('change', fb_importUsers_onFile);
+    document.getElementById('fbImportExecuteBtn')?.addEventListener('click', fb_importUsers_execute);
+    document.getElementById('fbImportResetBtn')?.addEventListener('click', fb_importUsers_reset);
+    // === CAMBIAR CONTRASEÑA (usuario autenticado) ===
+    document.getElementById('fbAccountChangePasswordBtn')?.addEventListener('click', () => {
+        document.getElementById('fbChangePwCurrent').value = '';
+        document.getElementById('fbChangePwNew').value = '';
+        document.getElementById('fbChangePwConfirm').value = '';
+        document.getElementById('fbChangePwMessage').innerHTML = '';
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('fbChangePasswordModal')).show();
+    });
+    document.getElementById('fbChangePwConfirmBtn')?.addEventListener('click', fb_changeOwnPassword);
+    document.getElementById('fbChangePwConfirm')?.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); fb_changeOwnPassword(); } });
     document.getElementById('fbUsersSearch')?.addEventListener('input', fb_renderUsers);
     document.getElementById('fbAdminActSearch')?.addEventListener('input', fb_renderAdminActivities);
     // Al cambiar a la pestaña de actividades del admin, renderizar la lista
