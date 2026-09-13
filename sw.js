@@ -1,7 +1,7 @@
 // Service Worker para Evaluación Criterial Multimateria
 // Desplegado en: https://angelmicelti.github.io/AppCalificaActividadesMateriaGeneralV2/
 
-const CACHE_NAME = 'eval-criterial-multimateria-v2.0.1';
+const CACHE_NAME = 'eval-criterial-multimateria-v2.0.2';
 const BASE_PATH = '/AppCalificaActividadesMateriaGeneralV2/';
 const URLS_TO_CACHE = [
     BASE_PATH,
