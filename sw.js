@@ -1,6 +1,6 @@
 // Service Worker para Evaluación Criterial Multimateria
 
-const CACHE_NAME = 'eval-criterial-multimateria-v2.0.7';
+const CACHE_NAME = 'eval-criterial-multimateria-v2.0.8';
 const BASE_PATH = '/CalificaActividadesMateriaGenericaV2/';
 const URLS_TO_CACHE = [
     BASE_PATH,
