@@ -2595,45 +2595,6 @@
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         NUEVO: MODAL AÑADIR NUEVO USUARIO (solo admin)
-         Evita el bucle que devolvía al panel de administración. Usa una
-         instancia secundaria de Firebase Auth para no cerrar la sesión del
-         administrador actual.
-         ═══════════════════════════════════════════════════════════════════════ -->
-    <div class="modal fade" id="fbAddUserModal" tabindex="-1" aria-labelledby="fbAddUserModalLabel" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header" style="background: linear-gradient(145deg, #198754, #0f6b3f);">
-                    <h5 class="modal-title text-white" id="fbAddUserModalLabel"><i class="bi bi-person-plus-fill me-2"></i>Añadir nuevo usuario</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-info small py-2 px-3 mb-3">
-                        <i class="bi bi-info-circle"></i> El nuevo usuario accederá con el <b>usuario</b> y la <b>contraseña</b> que indiques. Podrá cambiarla después desde su panel de cuenta.
-                    </div>
-                    <input type="text" class="form-control mb-2" id="fbAddUserName" placeholder="Nombre para mostrar (ej: Juan Pérez)" autocomplete="off">
-                    <input type="text" class="form-control mb-2" id="fbAddUserUsername" placeholder="Usuario (3-30 chars: letras, números, . _ -)" autocomplete="off">
-                    <input type="password" class="form-control mb-2" id="fbAddUserPassword" placeholder="Contraseña (mínimo 6 caracteres)" autocomplete="new-password">
-                    <input type="text" class="form-control mb-2" id="fbAddUserTutoria" placeholder="Tutoría (opcional)" autocomplete="off">
-                    <div class="mb-2">
-                        <label class="form-label fw-semibold small text-uppercase">Rol</label>
-                        <select class="form-select" id="fbAddUserRole">
-                            <option value="user" selected>Profesor</option>
-                            <option value="admin">Administrador</option>
-                        </select>
-                    </div>
-                    <div id="fbAddUserMessage" class="small"></div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-success" id="fbAddUserConfirmBtn"><i class="bi bi-check2-circle"></i> Crear usuario</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ═══════════════════ FIN NUEVO MODAL ═══════════════════ -->
-
     <!-- MODAL CAMBIAR CONTRASEÑA (usuario autenticado) -->
     <div class="modal fade" id="fbChangePasswordModal" tabindex="-1" aria-labelledby="fbChangePasswordModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -3753,7 +3714,7 @@ function exportResults(app, fmt, includeGrade) {
         const headers = Object.keys(resultados[0] || {});
         doc.autoTable({ head:[headers], body:resultados.map(r=>headers.map(h=>r[h]??'')), startY:43, theme:'grid' });
         doc.save(`Resultados_${baseName}.pdf`);
-        }
+        }       
 }
 
 // =============================================================================
@@ -8917,106 +8878,6 @@ async function fb_importUsers_execute() {
     try { fb_renderUsers(); } catch (e) {}
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// === NUEVO: CREAR USUARIO INDIVIDUAL DESDE EL PANEL DE ADMINISTRACIÓN ===
-// ═══════════════════════════════════════════════════════════════════════════
-// Usa una instancia SECUNDARIA de Firebase Auth para crear la cuenta sin
-// cerrar la sesión del administrador en la app principal (mismo patrón que
-// la importación masiva desde Excel). Evita el bucle que devolvía al panel
-// de administración al pulsar "Añadir nuevo usuario".
-async function fb_adminCreateUser() {
-    if (!fbCurrentUser || fbCurrentUser.role !== 'admin') {
-        alert('Solo un administrador puede crear usuarios.');
-        return;
-    }
-    const nameEl = document.getElementById('fbAddUserName');
-    const userEl = document.getElementById('fbAddUserUsername');
-    const passEl = document.getElementById('fbAddUserPassword');
-    const tutEl  = document.getElementById('fbAddUserTutoria');
-    const roleEl = document.getElementById('fbAddUserRole');
-    const msgEl  = document.getElementById('fbAddUserMessage');
-    const btnEl  = document.getElementById('fbAddUserConfirmBtn');
-
-    const show = (text, type) => {
-        const cls = type === 'success' ? 'alert-success'
-                  : type === 'warning' ? 'alert-warning'
-                  : 'alert-danger';
-        const icon = type === 'success' ? 'bi-check-circle'
-                   : 'bi-exclamation-triangle';
-        msgEl.innerHTML = `<div class="alert ${cls} py-1 px-2 mb-0"><i class="bi ${icon}"></i> ${escapeHtml(text)}</div>`;
-    };
-    msgEl.innerHTML = '';
-
-    const displayName = nameEl.value.trim();
-    const username    = userEl.value.trim().toLowerCase();
-    const password    = passEl.value;
-    const tutoria     = tutEl.value.trim();
-    const role        = roleEl.value;
-
-    if (!displayName) { show('Introduce el nombre para mostrar.', 'danger'); return; }
-    if (!fb_isValidUsername(username)) {
-        show('Usuario no válido: 3-30 caracteres alfanuméricos (letras, números, . _ -).', 'danger');
-        return;
-    }
-    if (password.length < 6) { show('La contraseña debe tener al menos 6 caracteres.', 'danger'); return; }
-    if (fbAllUsers.some(u => (u.username || '').toLowerCase() === username)) {
-        show('Ya existe un usuario con ese nombre. Elige otro.', 'danger');
-        return;
-    }
-
-    btnEl.disabled = true;
-    // Instancia secundaria de Firebase para no afectar a la sesión del admin
-    let secApp = null;
-    try {
-        try { secApp = firebase.app('fbImportSecondary'); } catch (e) { secApp = null; }
-        if (!secApp) secApp = firebase.initializeApp(FB_CONFIG, 'fbImportSecondary');
-    } catch (e) {
-        show('No se pudo inicializar Firebase: ' + e.message, 'danger');
-        btnEl.disabled = false;
-        return;
-    }
-    const secAuth = secApp.auth();
-
-    try {
-        const email = fb_usernameToEmail(username);
-        const cred  = await secAuth.createUserWithEmailAndPassword(email, password);
-        const uid   = cred.user.uid;
-        try { await cred.user.updateProfile({ displayName }); } catch (e) {}
-        try { await secAuth.signOut(); } catch (e) {}
-
-        const record = {
-            uid: uid,
-            username: username,
-            email: email,
-            displayName: displayName,
-            role: role,
-            appId: FB_APP_ID,
-            source: 'manual',
-            createdAt: Date.now()
-        };
-        if (tutoria) record.tutoria = tutoria;
-        await fbDb.ref(`${FB_USERS_PATH}/${uid}`).set(record);
-
-        show(`Usuario "${displayName}" creado correctamente.`, 'success');
-        // Limpiar formulario para poder añadir más usuarios sin cerrar el modal
-        nameEl.value = ''; userEl.value = ''; passEl.value = ''; tutEl.value = ''; roleEl.value = 'user';
-        // Refrescar la lista del admin (aunque esté detrás del modal)
-        try { fb_renderUsers(); } catch (e) {}
-    } catch (err) {
-        console.error('Error creando usuario:', err);
-        let m = err && err.message ? err.message : String(err);
-        if (err.code === 'auth/email-already-in-use') m = 'Ya existe una cuenta de autenticación con ese usuario.';
-        else if (err.code === 'auth/weak-password')   m = 'Contraseña demasiado débil (mínimo 6 caracteres).';
-        else if (err.code === 'auth/invalid-email')   m = 'Usuario no válido.';
-        else if (err.code === 'auth/too-many-requests') m = 'Demasiadas peticiones; espera unos minutos.';
-        show(m, 'danger');
-        try { await secAuth.signOut(); } catch (e) {}
-    } finally {
-        btnEl.disabled = false;
-    }
-}
-// ═══════════════ FIN NUEVA FUNCIÓN DE CREACIÓN DE USUARIO ═══════════════
-
 // === CAMBIO DE CONTRASEÑA DEL PROPIO USUARIO ===
 // Requiere reautenticación con la contraseña actual y luego actualiza la nueva.
 async function fb_changeOwnPassword() {
@@ -11898,56 +11759,13 @@ window.onload = function() {
         fb_renderAdminActivities();
         bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAdminModal')).show();
     });
-
-    // ═══════════════════════════════════════════════════════════════════════════
-    // NUEVO: "Añadir nuevo usuario" — abre el modal de creación (fbAddUserModal)
-    // en lugar del modal de cuenta. Ya no vuelve al panel de administración.
-    // ═══════════════════════════════════════════════════════════════════════════
-    let _fbAddUserReturnToAdmin = false;
     document.getElementById('fbUsersAddBtn')?.addEventListener('click', () => {
-        _fbAddUserReturnToAdmin = true;
-        // Cerrar el panel de administración y abrir el modal de creación
+        // Cerrar modal de administración y abrir modal de auth en pestaña registro
         bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAdminModal')).hide();
-        // Reset del formulario
-        document.getElementById('fbAddUserName').value = '';
-        document.getElementById('fbAddUserUsername').value = '';
-        document.getElementById('fbAddUserPassword').value = '';
-        document.getElementById('fbAddUserTutoria').value = '';
-        document.getElementById('fbAddUserRole').value = 'user';
-        document.getElementById('fbAddUserMessage').innerHTML = '';
-        // Pequeña espera para que termine la animación de cierre del panel de admin
-        setTimeout(() => {
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAddUserModal')).show();
-        }, 350);
+        const registerTab = document.getElementById('fbAuthRegisterTab');
+        if (registerTab) new bootstrap.Tab(registerTab).show();
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAuthModal')).show();
     });
-    // Al cerrar el modal de creación de usuario, volver al panel de administración
-    document.getElementById('fbAddUserModal')?.addEventListener('hidden.bs.modal', () => {
-        if (_fbAddUserReturnToAdmin && fbCurrentUser && fbCurrentUser.role === 'admin') {
-            _fbAddUserReturnToAdmin = false;
-            try { fb_renderUsers(); } catch (e) {}
-            try { fb_renderAdminActivities(); } catch (e) {}
-            setTimeout(() => {
-                bootstrap.Modal.getOrCreateInstance(document.getElementById('fbAdminModal')).show();
-            }, 200);
-        } else {
-            _fbAddUserReturnToAdmin = false;
-        }
-    });
-    // Botón "Crear usuario" dentro del nuevo modal
-    document.getElementById('fbAddUserConfirmBtn')?.addEventListener('click', fb_adminCreateUser);
-    // Permitir crear el usuario pulsando Enter desde cualquier campo del modal
-    ['fbAddUserName','fbAddUserUsername','fbAddUserPassword','fbAddUserTutoria'].forEach(id => {
-        document.getElementById(id)?.addEventListener('keydown', e => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                if (!document.getElementById('fbAddUserConfirmBtn').disabled) {
-                    fb_adminCreateUser();
-                }
-            }
-        });
-    });
-    // ═══════════════════════════════════════════════════════════════════════════
-
     // === IMPORTAR USUARIOS DESDE EXCEL (solo admin) ===
     let _fbImportReturnToAdmin = false;
     document.getElementById('fbUsersImportBtn')?.addEventListener('click', () => {
